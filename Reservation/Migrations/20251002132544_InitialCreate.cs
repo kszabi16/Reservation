@@ -230,7 +230,7 @@ namespace Reservation.Migrations
                 name: "IX_Likes_UserId",
                 table: "Likes",
                 column: "UserId");
-
+              
             migrationBuilder.CreateIndex(
                 name: "IX_Properties_HostId",
                 table: "Properties",
