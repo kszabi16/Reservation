@@ -127,3 +127,5 @@ Authorization: Bearer your-jwt-token-here
 3. **Ellenőrizd** a konzol hibákat
 4. **Teszteld** a teszt endpoint-ot
 
+
+

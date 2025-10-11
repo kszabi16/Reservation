@@ -2,13 +2,6 @@
 
 ## Regisztráció és Belépés Funkciók
 
-### Létrehozott komponensek:
-
-1. **AuthDto.cs** - Authentication DTO-k
-2. **IAuthService.cs** - Auth service interfész
-3. **AuthService.cs** - Auth service implementáció
-4. **AuthController.cs** - Auth controller
-
 ### API Endpoints:
 
 #### Regisztráció
@@ -67,26 +60,6 @@ POST /api/auth/refresh-token
 - User ID, Username, Email, Role információ
 - Refresh token funkció
 
-### Beállítás lépések:
-
-1. **NuGet csomagok telepítése:**
-   ```bash
-   dotnet restore
-   ```
-
-2. **JWT konfiguráció engedélyezése:**
-   - Program.cs-ben uncommenteld a JWT beállításokat
-   - appsettings.json-ben már be van állítva a JWT konfiguráció
-
-3. **Adatbázis migráció:**
-   ```bash
-   dotnet ef migrations add AddAuth
-   dotnet ef database update
-   ```
-
-4. **Tesztelés:**
-   - Swagger UI: https://localhost:7102/swagger
-   - Auth endpoints: /api/auth/*
 
 ### Biztonsági megjegyzések:
 - Jelszavak BCrypt-tel hash-eltek
