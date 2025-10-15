@@ -66,7 +66,19 @@ namespace Reservation
                     b => b.MigrationsAssembly("Reservation")
                 ));
 
-           
+
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowFrontend", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                          .AllowAnyHeader()
+                          .AllowAnyMethod();
+                });
+            });
+
+            
+
             builder.Services.AddScoped<IBookingService, BookingService>();
             builder.Services.AddScoped<IPropertyService, PropertyService>();
             builder.Services.AddScoped<IUserService, UserService>();
@@ -95,6 +107,8 @@ namespace Reservation
             builder.Services.AddAutoMapper(cfg => cfg.AddProfile<AutoMapperProfile>());
 
             var app = builder.Build();
+
+            app.UseCors("AllowFrontend");
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

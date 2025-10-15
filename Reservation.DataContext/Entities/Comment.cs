@@ -12,10 +12,7 @@
         public int PropertyId { get; set; }
         public Property Property { get; set; } = null!;
 
-        // Opcionális: válasz másik kommentre
-        public int? ParentCommentId { get; set; }
-        public Comment? ParentComment { get; set; }
-        public ICollection<Comment> Replies { get; set; } = new List<Comment>();
+        
     }
 
 }

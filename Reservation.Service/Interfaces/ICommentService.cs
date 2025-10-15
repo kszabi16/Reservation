@@ -6,7 +6,7 @@ namespace Reservation.Service.Interfaces
     {
         Task<IEnumerable<CommentDto>> GetAllCommentsAsync();
         Task<CommentDto?> GetCommentByIdAsync(int id);
-        Task<CommentDto> CreateCommentAsync(CreateCommentDto createCommentDto);
+        Task<CommentDto> CreateCommentAsync(CreateCommentDto createCommentDto,int userId);
         Task<CommentDto?> UpdateCommentAsync(int id, CreateCommentDto updateCommentDto);
         Task<bool> DeleteCommentAsync(int id);
         Task<IEnumerable<CommentDto>> GetCommentsByPropertyIdAsync(int propertyId);

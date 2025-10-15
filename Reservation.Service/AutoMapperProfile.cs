@@ -44,8 +44,6 @@ namespace Reservation.Service.AutoMapper
             CreateMap<CreateCommentDto, Comment>()
                 .ForMember(dest => dest.User, opt => opt.Ignore())
                 .ForMember(dest => dest.Property, opt => opt.Ignore())
-                .ForMember(dest => dest.ParentComment, opt => opt.Ignore())
-                .ForMember(dest => dest.Replies, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
 

@@ -53,17 +53,67 @@ namespace Reservation.DataContext.Context
                 .HasForeignKey(p => p.HostId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // Comment -> ParentComment kapcsolat (Restrict)
-            modelBuilder.Entity<Comment>()
-                .HasOne(c => c.ParentComment)
-                .WithMany(c => c.Replies)
-                .HasForeignKey(c => c.ParentCommentId)
-                .OnDelete(DeleteBehavior.Restrict);
-
             // Decimal precision beállítása a PricePerNight mezőhöz
             modelBuilder.Entity<Property>()
                 .Property(p => p.PricePerNight)
                 .HasPrecision(18, 2);
+
+            modelBuilder.Entity<Property>().HasData(
+               new Property
+               {
+                   Id = 1,
+                   Title = "Budapest belvárosi apartman",
+                   Description = "Modern apartman a Deák tér közelében, remek kilátással.",
+                   Location = "Budapest",
+                   PricePerNight = 25000m,
+                   Capacity = 3,
+                   CreatedAt = new DateTime(2024, 10, 14),
+                   HostId = 2 
+               },
+               new Property
+               {
+                   Id = 2,
+                   Title = "Balatoni nyaraló",
+                   Description = "Kényelmes ház közvetlenül a Balaton partján.",
+                   Location = "Siófok",
+                   PricePerNight = 45000m,
+                   Capacity = 6,
+                   CreatedAt = new DateTime(2024, 10, 14),
+                   HostId = 2
+               },
+               new Property
+               {
+                   Id = 3,
+                   Title = "Hegyi faház Mátrában",
+                   Description = "Hangulatos faház kandallóval és panorámás terasszal.",
+                   Location = "Mátraháza",
+                   PricePerNight = 32000m,
+                   Capacity = 5,
+                   CreatedAt = new DateTime(2024,10,14),
+                   HostId =2 
+               }
+           );
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Username = "Kovács Béla",
+                    Email = "bela@example.com",
+                    PasswordHash = "hashed_pw",
+                    Role = RoleType.Host
+                },
+                new User
+                {
+                    Id = 2,
+                    Username = "Tóth Anna",
+                    Email = "anna@example.com",
+                    PasswordHash = "hashed_pw",
+                    Role = RoleType.Host
+                }
+            );
+
+
         }
+
     }
 }

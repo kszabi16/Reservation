@@ -30,33 +30,27 @@ namespace Reservation.Service.Services
             return comment == null ? null : _mapper.Map<CommentDto>(comment);
         }
 
-        public async Task<CommentDto> CreateCommentAsync(CreateCommentDto createCommentDto)
+        public async Task<CommentDto> CreateCommentAsync(CreateCommentDto createCommentDto, int userId)
         {
-            var user = await _context.Users.FindAsync(createCommentDto.UserId);
-            if (user == null)
-                throw new InvalidOperationException("User not found.");
-
             var property = await _context.Properties.FindAsync(createCommentDto.PropertyId);
             if (property == null)
                 throw new InvalidOperationException("Property not found.");
-
-            // Ha van parent comment, ellenőrizzük hogy létezik-e
-            if (createCommentDto.ParentCommentId.HasValue)
-            {
-                var parentComment = await _context.Comments.FindAsync(createCommentDto.ParentCommentId.Value);
-                if (parentComment == null)
-                    throw new InvalidOperationException("Parent comment not found.");
-            }
 
             if (string.IsNullOrWhiteSpace(createCommentDto.Content))
                 throw new InvalidOperationException("Comment content cannot be empty.");
 
             var comment = _mapper.Map<Comment>(createCommentDto);
+
+            
+            comment.UserId = userId;
+            comment.CreatedAt = DateTime.UtcNow;
+
             _context.Comments.Add(comment);
             await _context.SaveChangesAsync();
 
             return _mapper.Map<CommentDto>(comment);
         }
+
 
         public async Task<CommentDto?> UpdateCommentAsync(int id, CreateCommentDto updateCommentDto)
         {
@@ -102,10 +96,9 @@ namespace Reservation.Service.Services
             return _mapper.Map<IEnumerable<CommentDto>>(comments);
         }
 
-        public async Task<IEnumerable<CommentDto>> GetCommentRepliesAsync(int parentCommentId)
+        public async Task<IEnumerable<CommentDto>> GetCommentRepliesAsync(int CommentId)
         {
             var replies = await _context.Comments
-                .Where(c => c.ParentCommentId == parentCommentId)
                 .OrderBy(c => c.CreatedAt)
                 .ToListAsync();
             return _mapper.Map<IEnumerable<CommentDto>>(replies);
@@ -114,7 +107,7 @@ namespace Reservation.Service.Services
         public async Task<IEnumerable<CommentDto>> GetTopLevelCommentsAsync(int propertyId)
         {
             var topLevelComments = await _context.Comments
-                .Where(c => c.PropertyId == propertyId && c.ParentCommentId == null)
+                .Where(c => c.PropertyId == propertyId )
                 .OrderBy(c => c.CreatedAt)
                 .ToListAsync();
             return _mapper.Map<IEnumerable<CommentDto>>(topLevelComments);
