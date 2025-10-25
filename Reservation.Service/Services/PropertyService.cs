@@ -20,7 +20,10 @@ namespace Reservation.Service.Services
 
         public async Task<IEnumerable<PropertyDto>> GetAllPropertiesAsync()
         {
-            var properties = await _context.Properties.ToListAsync();
+            var properties = await _context.Properties
+                .Where(p => p.IsApproved)
+                .ToListAsync();
+
             return _mapper.Map<IEnumerable<PropertyDto>>(properties);
         }
 
@@ -30,34 +33,51 @@ namespace Reservation.Service.Services
             return property == null ? null : _mapper.Map<PropertyDto>(property);
         }
 
-        public async Task<PropertyDto> CreatePropertyAsync(CreatePropertyDto createPropertyDto)
+        public async Task<PropertyDto> CreatePropertyAsync(int userId, CreatePropertyDto dto)
         {
-            var host = await _context.Users.FindAsync(createPropertyDto.HostId);
-            if (host == null)
-                throw new InvalidOperationException("Host not found.");
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new InvalidOperationException("User not found.");
 
-            if (host.Role != RoleType.Host && host.Role != RoleType.Admin)
-                throw new InvalidOperationException("User is not authorized to create properties.");
+            var property = _mapper.Map<Property>(dto);
+            property.HostId = userId;
 
-            var property = _mapper.Map<Property>(createPropertyDto);
-            _context.Properties.Add(property);
-            await _context.SaveChangesAsync();
+            // ha Guest adja fel, nem publikáljuk, hanem pending lesz
+            if (user.Role == RoleType.Guest)
+            {
+                property.IsApproved = false;
+
+                _context.Properties.Add(property);
+                await _context.SaveChangesAsync();
+
+                // létrehozunk egy HostRequest-et
+                var hostRequest = new HostRequest
+                {
+                    UserId = userId,
+                    PropertyId = property.Id,
+                    RequestedAt = DateTime.UtcNow,
+                    IsApproved = false
+                };
+                _context.HostRequests.Add(hostRequest);
+                await _context.SaveChangesAsync();
+            }
+            else
+            {
+                // ha már Host, azonnal mehet publikálva
+                property.IsApproved = true;
+                _context.Properties.Add(property);
+                await _context.SaveChangesAsync();
+            }
 
             return _mapper.Map<PropertyDto>(property);
         }
+
 
         public async Task<PropertyDto?> UpdatePropertyAsync(int id, CreatePropertyDto updatePropertyDto)
         {
             var property = await _context.Properties.FindAsync(id);
             if (property == null)
                 return null;
-
-            var host = await _context.Users.FindAsync(updatePropertyDto.HostId);
-            if (host == null)
-                throw new InvalidOperationException("Host not found.");
-
-            if (host.Role != RoleType.Host && host.Role != RoleType.Admin)
-                throw new InvalidOperationException("User is not authorized to manage properties.");
 
             _mapper.Map(updatePropertyDto, property);
             await _context.SaveChangesAsync();
@@ -105,6 +125,11 @@ namespace Reservation.Service.Services
             var properties = await _context.Properties
                 .Where(p => p.Capacity >= minCapacity)
                 .ToListAsync();
+            return _mapper.Map<IEnumerable<PropertyDto>>(properties);
+        }
+        public async Task<IEnumerable<PropertyDto>> GetAllPropertiesForAdminAsync()
+        {
+            var properties = await _context.Properties.ToListAsync();
             return _mapper.Map<IEnumerable<PropertyDto>>(properties);
         }
     }

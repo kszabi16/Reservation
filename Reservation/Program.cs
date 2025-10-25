@@ -86,6 +86,8 @@ namespace Reservation
             builder.Services.AddScoped<IFavoriteService, FavoriteService>();
             builder.Services.AddScoped<ILikeService, LikeService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
+            builder.Services.AddScoped<IHostRequestService, HostRequestService>();
+
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
@@ -108,7 +110,7 @@ namespace Reservation
 
             var app = builder.Build();
 
-            app.UseCors("AllowFrontend");
+            
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
@@ -118,10 +120,9 @@ namespace Reservation
             }
 
             app.UseHttpsRedirection();
-
+            app.UseCors("AllowFrontend");
             app.UseAuthentication();
             app.UseAuthorization();
-
             app.MapControllers();
             app.Run();
         }

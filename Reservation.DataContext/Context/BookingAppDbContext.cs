@@ -12,6 +12,8 @@ namespace Reservation.DataContext.Context
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Like> Likes { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
+        public DbSet<HostRequest> HostRequests { get; set; }
+
 
         public ReservationDbContext(DbContextOptions<ReservationDbContext> options) : base(options)
         {
@@ -57,6 +59,23 @@ namespace Reservation.DataContext.Context
             modelBuilder.Entity<Property>()
                 .Property(p => p.PricePerNight)
                 .HasPrecision(18, 2);
+
+            // HostRequest -> Property kapcsolat
+            modelBuilder.Entity<HostRequest>()
+                .HasOne(r => r.Property)
+                .WithMany()
+                .HasForeignKey(r => r.PropertyId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            // HostRequest -> User kapcsolat
+            modelBuilder.Entity<HostRequest>()
+                .HasOne(r => r.User)
+                .WithMany()
+                .HasForeignKey(r => r.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+
+
 
             modelBuilder.Entity<Property>().HasData(
                new Property

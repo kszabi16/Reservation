@@ -9,6 +9,9 @@
         public int Capacity { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        // Jóváhagyás státusza
+        public bool IsApproved { get; set; } = false;
+
         // Kapcsolatok
         public int HostId { get; set; }
         public User Host { get; set; } = null!;

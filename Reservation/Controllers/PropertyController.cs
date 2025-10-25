@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reservation.DataContext.Dtos;
 using Reservation.Service.Interfaces;
+using System.Security.Claims;
 
 namespace Reservation.Controllers
 {
@@ -36,14 +37,16 @@ namespace Reservation.Controllers
             return Ok(property);
         }
 
-        [Authorize(Roles = "Host,Admin")]
+        [Authorize]
         [HttpPost]
         public async Task<ActionResult<PropertyDto>> CreateProperty([FromBody] CreatePropertyDto createPropertyDto)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var property = await _propertyService.CreatePropertyAsync(createPropertyDto);
+            var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+            var property = await _propertyService.CreatePropertyAsync(userId,createPropertyDto);
             return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
         }
 
@@ -109,5 +112,14 @@ namespace Reservation.Controllers
             var properties = await _propertyService.GetPropertiesByCapacityAsync(minCapacity);
             return Ok(properties);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet("all")]
+        public async Task<ActionResult<IEnumerable<PropertyDto>>> GetAllPropertiesForAdmin()
+        {
+            var properties = await _propertyService.GetAllPropertiesForAdminAsync();
+            return Ok(properties);
+        }
+
     }
 }

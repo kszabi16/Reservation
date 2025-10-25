@@ -39,13 +39,13 @@ namespace Reservation.Service.Services
             // Jelszó hash-elés
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password);
 
-            // Új felhasználó létrehozása
+            // Új felhasználó létrehozása — mindig Guest
             var user = new User
             {
                 Username = registerDto.Username,
                 Email = registerDto.Email,
                 PasswordHash = passwordHash,
-                Role = registerDto.Role
+                Role = RoleType.Guest // 🔹 Fix: mindig Guest
             };
 
             _context.Users.Add(user);
@@ -64,11 +64,12 @@ namespace Reservation.Service.Services
             };
         }
 
+
         public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
         {
             // Felhasználó keresése username vagy email alapján
             var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Username == loginDto.Username || u.Email == loginDto.Username);
+                .FirstOrDefaultAsync(u => u.Username == loginDto.Email || u.Email == loginDto.Email);
 
             if (user == null)
                 throw new InvalidOperationException("Invalid username or password.");
