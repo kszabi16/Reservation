@@ -42,15 +42,14 @@ namespace Reservation.Service.Services
             var property = _mapper.Map<Property>(dto);
             property.HostId = userId;
 
-            // ha Guest adja fel, nem publikáljuk, hanem pending lesz
             if (user.Role == RoleType.Guest)
             {
+               
                 property.IsApproved = false;
 
                 _context.Properties.Add(property);
                 await _context.SaveChangesAsync();
 
-                // létrehozunk egy HostRequest-et
                 var hostRequest = new HostRequest
                 {
                     UserId = userId,
@@ -61,16 +60,26 @@ namespace Reservation.Service.Services
                 _context.HostRequests.Add(hostRequest);
                 await _context.SaveChangesAsync();
             }
+            else if (user.Role == RoleType.Host && !user.IsTrustedHost)
+            {
+                
+                property.IsApproved = false;
+
+                _context.Properties.Add(property);
+                await _context.SaveChangesAsync();
+            }
             else
             {
-                // ha már Host, azonnal mehet publikálva
+                
                 property.IsApproved = true;
+
                 _context.Properties.Add(property);
                 await _context.SaveChangesAsync();
             }
 
             return _mapper.Map<PropertyDto>(property);
         }
+
 
 
         public async Task<PropertyDto?> UpdatePropertyAsync(int id, CreatePropertyDto updatePropertyDto)

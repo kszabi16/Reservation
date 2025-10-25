@@ -100,5 +100,15 @@ namespace Reservation.Service.Services
         {
             return await _context.Users.AnyAsync(u => u.Username == username);
         }
+        public async Task SetTrustedStatusAsync(int userId, bool isTrusted)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                throw new InvalidOperationException("User not found.");
+
+            user.IsTrustedHost = isTrusted;
+            await _context.SaveChangesAsync();
+        }
+
     }
 }

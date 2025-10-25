@@ -13,6 +13,7 @@
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
         public RoleType Role { get; set; }
+        public bool IsTrustedHost { get; set; } = false;
 
         // Kapcsolatok
         public ICollection<Property> Properties { get; set; } = new List<Property>();

@@ -127,5 +127,18 @@ namespace Reservation.Controllers
             var exists = await _userService.UsernameExistsAsync(username);
             return Ok(exists);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/trust")]
+        public async Task<ActionResult> SetTrustedHost(int id, [FromQuery] bool isTrusted)
+        {
+            var user = await _userService.GetUserByIdAsync(id);
+            if (user == null)
+                return NotFound($"User with ID {id} not found.");
+
+            await _userService.SetTrustedStatusAsync(id, isTrusted);
+            return Ok(new { message = $"User {(isTrusted ? "marked as trusted" : "untrusted")} host." });
+        }
+
     }
 }

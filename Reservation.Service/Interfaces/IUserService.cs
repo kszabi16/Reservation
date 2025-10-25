@@ -13,5 +13,7 @@ namespace Reservation.Service.Interfaces
         Task<UserDto?> GetUserByUsernameAsync(string username);
         Task<bool> EmailExistsAsync(string email);
         Task<bool> UsernameExistsAsync(string username);
+        Task SetTrustedStatusAsync(int userId, bool isTrusted);
+
     }
 }

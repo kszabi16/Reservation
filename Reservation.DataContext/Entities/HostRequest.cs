@@ -18,5 +18,7 @@ namespace Reservation.DataContext.Entities
         public DateTime RequestedAt { get; set; } = DateTime.UtcNow;
 
         public bool IsApproved { get; set; } = false;
+
+        public DateTime? ApprovedAt { get; set; } = null;
     }
 }

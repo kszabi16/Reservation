@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Reservation.DataContext.Context;
 
@@ -11,9 +12,11 @@ using Reservation.DataContext.Context;
 namespace Reservation.Migrations
 {
     [DbContext(typeof(ReservationDbContext))]
-    partial class ReservationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251025131311_AddApprovedAtToHostRequest")]
+    partial class AddApprovedAtToHostRequest
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -296,9 +299,6 @@ namespace Reservation.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsTrustedHost")
-                        .HasColumnType("bit");
-
                     b.Property<string>("PasswordHash")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -320,7 +320,6 @@ namespace Reservation.Migrations
                             Id = 1,
                             Deleted = false,
                             Email = "bela@example.com",
-                            IsTrustedHost = false,
                             PasswordHash = "hashed_pw",
                             Role = 1,
                             Username = "Kovács Béla"
@@ -330,7 +329,6 @@ namespace Reservation.Migrations
                             Id = 2,
                             Deleted = false,
                             Email = "anna@example.com",
-                            IsTrustedHost = false,
                             PasswordHash = "hashed_pw",
                             Role = 1,
                             Username = "Tóth Anna"

@@ -9,6 +9,8 @@
         public string PropertyTitle { get; set; } = null!;
         public bool IsApproved { get; set; }
         public DateTime RequestedAt { get; set; }
+
+        public DateTime? ApprovedAt { get; set; }
     }
 
     public class CreateHostRequestDto

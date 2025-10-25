@@ -89,6 +89,7 @@ namespace Reservation.Service.Services
 
             request.IsApproved = true;
             request.Property.IsApproved = true;
+            request.ApprovedAt = DateTime.UtcNow;
             request.User.Role = RoleType.Host;
 
             await _context.SaveChangesAsync();

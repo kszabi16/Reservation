@@ -66,7 +66,8 @@ namespace Reservation.Service.AutoMapper
 
             CreateMap<HostRequest, HostRequestDto>()
                 .ForMember(dest => dest.Username, opt => opt.MapFrom(src => src.User.Username))
-                .ForMember(dest => dest.PropertyTitle, opt => opt.MapFrom(src => src.Property.Title));
+                .ForMember(dest => dest.PropertyTitle, opt => opt.MapFrom(src => src.Property.Title))
+                .ForMember(dest => dest.ApprovedAt, opt => opt.MapFrom(src => src.ApprovedAt));
 
             CreateMap<CreateHostRequestDto, HostRequest>();
         }
