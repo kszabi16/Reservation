@@ -15,12 +15,18 @@
         public RoleType Role { get; set; }
         public bool IsTrustedHost { get; set; } = false;
 
-        // Kapcsolatok
+        // --- ÚJ MEZŐK A PROFILHOZ 
+        public string? PhoneNumber { get; set; } 
+        public string? Location { get; set; }    
+        public string? Bio { get; set; }       
+        public string? AvatarUrl { get; set; }   
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        
         public ICollection<Property> Properties { get; set; } = new List<Property>();
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();
         public ICollection<Like> Likes { get; set; } = new List<Like>();
     }
-
 }

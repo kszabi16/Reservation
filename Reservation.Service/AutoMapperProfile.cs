@@ -8,16 +8,23 @@ namespace Reservation.Service.AutoMapper
     {
         public AutoMapperProfile()
         {
-            // User mappings
             CreateMap<User, UserDto>();
+
             CreateMap<CreateUserDto, User>()
-                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password)) // majd hash-elni kell
+                .ForMember(dest => dest.PasswordHash, opt => opt.MapFrom(src => src.Password))
                 .ForMember(dest => dest.Properties, opt => opt.Ignore())
                 .ForMember(dest => dest.Bookings, opt => opt.Ignore())
                 .ForMember(dest => dest.Comments, opt => opt.Ignore())
                 .ForMember(dest => dest.Favorites, opt => opt.Ignore())
                 .ForMember(dest => dest.Likes, opt => opt.Ignore())
-                .ForMember(dest => dest.Deleted, opt => opt.Ignore());
+                .ForMember(dest => dest.Deleted, opt => opt.Ignore())
+                .ForMember(dest => dest.PhoneNumber, opt => opt.Ignore())
+                .ForMember(dest => dest.Location, opt => opt.Ignore())
+                .ForMember(dest => dest.Bio, opt => opt.Ignore())
+                .ForMember(dest => dest.AvatarUrl, opt => opt.Ignore());
+
+            CreateMap<UpdateUserProfileDto, User>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // Property mappings
             CreateMap<Property, PropertyDto>();

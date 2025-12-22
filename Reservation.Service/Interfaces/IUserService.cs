@@ -15,5 +15,7 @@ namespace Reservation.Service.Interfaces
         Task<bool> UsernameExistsAsync(string username);
         Task SetTrustedStatusAsync(int userId, bool isTrusted);
 
+        Task<UserDto?> UpdateUserProfileAsync(int id, UpdateUserProfileDto profileDto);
+
     }
 }

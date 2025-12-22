@@ -110,5 +110,16 @@ namespace Reservation.Service.Services
             await _context.SaveChangesAsync();
         }
 
+        public async Task<UserDto?> UpdateUserProfileAsync(int id, UpdateUserProfileDto profileDto)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return null;
+            _mapper.Map(profileDto, user);
+
+            await _context.SaveChangesAsync();
+            
+            return _mapper.Map<UserDto>(user);
+        }
+
     }
 }
