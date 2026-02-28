@@ -141,5 +141,25 @@ namespace Reservation.Service.Services
             var properties = await _context.Properties.ToListAsync();
             return _mapper.Map<IEnumerable<PropertyDto>>(properties);
         }
+
+        public async Task<IEnumerable<PropertyDto>> GetPendingPropertiesAsync()
+        {
+            var pendingProperties = await _context.Properties
+                .Where(p => !p.IsApproved)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<PropertyDto>>(pendingProperties);
+        }
+
+        public async Task<bool> ApprovePropertyAsync(int id)
+        {
+            var property = await _context.Properties.FindAsync(id);
+            if (property == null) return false;
+
+            property.IsApproved = true;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

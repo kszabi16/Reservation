@@ -18,86 +18,27 @@ namespace Reservation.Service.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<FavoriteDto>> GetAllFavoritesAsync()
-        {
-            var favorites = await _context.Favorites.ToListAsync();
-            return _mapper.Map<IEnumerable<FavoriteDto>>(favorites);
-        }
-
-        public async Task<FavoriteDto?> GetFavoriteByIdAsync(int id)
-        {
-            var favorite = await _context.Favorites.FindAsync(id);
-            return favorite == null ? null : _mapper.Map<FavoriteDto>(favorite);
-        }
-
-        public async Task<FavoriteDto> CreateFavoriteAsync(CreateFavoriteDto createFavoriteDto)
-        {
-            var user = await _context.Users.FindAsync(createFavoriteDto.UserId);
-            if (user == null)
-                throw new InvalidOperationException("User not found.");
-
-            var property = await _context.Properties.FindAsync(createFavoriteDto.PropertyId);
-            if (property == null)
-                throw new InvalidOperationException("Property not found.");
-
-            // Ellenőrizzük, hogy már nincs-e kedvenc
-            if (await IsFavoriteAsync(createFavoriteDto.UserId, createFavoriteDto.PropertyId))
-                throw new InvalidOperationException("Property is already in favorites.");
-
-            var favorite = _mapper.Map<Favorite>(createFavoriteDto);
-            _context.Favorites.Add(favorite);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<FavoriteDto>(favorite);
-        }
-
-        public async Task<bool> DeleteFavoriteAsync(int id)
-        {
-            var favorite = await _context.Favorites.FindAsync(id);
-            if (favorite == null)
-                return false;
-
-            favorite.Deleted = true;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
+        // 1. Kedvencek lekérdezése adott felhasználóhoz
         public async Task<IEnumerable<FavoriteDto>> GetFavoritesByUserIdAsync(int userId)
         {
             var favorites = await _context.Favorites
-                .Where(f => f.UserId == userId)
+                .Include(f => f.Property) // <--- EZ NAGYON FONTOS: Behozza az ingatlan adatait is a frontendnek!
+                .Where(f => f.UserId == userId && f.Deleted == false) // Csak a nem törölt kedvencek!
                 .OrderByDescending(f => f.CreatedAt)
                 .ToListAsync();
+
             return _mapper.Map<IEnumerable<FavoriteDto>>(favorites);
         }
 
-        public async Task<IEnumerable<FavoriteDto>> GetFavoritesByPropertyIdAsync(int propertyId)
-        {
-            var favorites = await _context.Favorites
-                .Where(f => f.PropertyId == propertyId)
-                .OrderByDescending(f => f.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<FavoriteDto>>(favorites);
-        }
-
+        // 2. Ellenőrzés, hogy kedvenc-e
         public async Task<bool> IsFavoriteAsync(int userId, int propertyId)
         {
-            return await _context.Favorites.AnyAsync(f => f.UserId == userId && f.PropertyId == propertyId);
+            // Csak akkor kedvenc, ha létezik ÉS nincs törölve
+            return await _context.Favorites
+                .AnyAsync(f => f.UserId == userId && f.PropertyId == propertyId && f.Deleted == false);
         }
 
-        public async Task<bool> RemoveFavoriteAsync(int userId, int propertyId)
-        {
-            var favorite = await _context.Favorites
-                .FirstOrDefaultAsync(f => f.UserId == userId && f.PropertyId == propertyId);
-            
-            if (favorite == null)
-                return false;
-
-            favorite.Deleted = true;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
+        // 3. Hozzáadás / Elvétel (Toggle)
         public async Task<bool> ToggleFavoriteAsync(int userId, int propertyId)
         {
             var user = await _context.Users.FindAsync(userId);
@@ -108,26 +49,40 @@ namespace Reservation.Service.Services
             if (property == null)
                 throw new InvalidOperationException("Property not found.");
 
+            // Megkeressük, hogy volt-e már valaha kedvencek között ez az ingatlan
             var existingFavorite = await _context.Favorites
                 .FirstOrDefaultAsync(f => f.UserId == userId && f.PropertyId == propertyId);
 
             if (existingFavorite != null)
             {
-                // Ha már kedvenc, akkor eltávolítjuk
-                existingFavorite.Deleted = true;
-                await _context.SaveChangesAsync();
-                return false; // Nem kedvenc többé
+                // Ha megvan, megfordítjuk a státuszát
+                if (existingFavorite.Deleted == true)
+                {
+                    existingFavorite.Deleted = false; // Visszaállítjuk
+                    await _context.SaveChangesAsync();
+                    return true; // Újra kedvenc lett
+                }
+                else
+                {
+                    existingFavorite.Deleted = true; // Töröljük
+                    await _context.SaveChangesAsync();
+                    return false; // Nem kedvenc többé
+                }
             }
             else
             {
-                // Ha nem kedvenc, akkor hozzáadjuk
+                // Ha még sosem volt kedvenc, létrehozzuk
                 var favorite = new Favorite
                 {
                     UserId = userId,
-                    PropertyId = propertyId
+                    PropertyId = propertyId,
+                    Deleted = false,
+                    CreatedAt = DateTime.UtcNow // Biztosítjuk, hogy legyen dátuma
                 };
+
                 _context.Favorites.Add(favorite);
                 await _context.SaveChangesAsync();
+
                 return true; // Kedvenc lett
             }
         }

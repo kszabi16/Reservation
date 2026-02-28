@@ -17,5 +17,6 @@ namespace Reservation.Service.Interfaces
         Task<bool> UpdateBookingStatusAsync(int id, BookingStatus status);
         Task<bool> CancelBookingAsync(int id);
         Task<bool> ConfirmBookingAsync(int id);
+        Task<IEnumerable<BookingDto>> GetPendingBookingsForHostAsync(int hostId);
     }
 }

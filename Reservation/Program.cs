@@ -17,8 +17,12 @@ namespace Reservation
         {
             var builder = WebApplication.CreateBuilder(args);
 
-          
-            builder.Services.AddControllers();
+
+            builder.Services.AddControllers()
+                 .AddJsonOptions(options =>
+                 {
+                     options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+                 });
             builder.Services.AddEndpointsApiExplorer();
 
        
@@ -87,6 +91,7 @@ namespace Reservation
             builder.Services.AddScoped<ILikeService, LikeService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IHostRequestService, HostRequestService>();
+            builder.Services.AddScoped<IRatingService, RatingService>();
 
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)

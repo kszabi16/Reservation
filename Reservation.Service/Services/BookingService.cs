@@ -168,5 +168,14 @@ namespace Reservation.Service.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<IEnumerable<BookingDto>> GetPendingBookingsForHostAsync(int hostId)
+        {
+            var pendingBookings = await _context.Bookings
+                .Include(b => b.Property) // Be kell emelni az ingatlant, hogy tudjuk, ki a tulaj
+                .Where(b => b.Property.HostId == hostId && b.Status == BookingStatus.Pending)
+                .ToListAsync();
+
+            return _mapper.Map<IEnumerable<BookingDto>>(pendingBookings);
+        }
     }
 }

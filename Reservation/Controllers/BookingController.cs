@@ -105,5 +105,17 @@ namespace Reservation.Controllers
 
             return Ok(new { message = "Booking status updated successfully." });
         }
+        [Authorize(Roles = "Host")]
+        [HttpGet("pending-requests")]
+        public async Task<ActionResult<IEnumerable<BookingDto>>> GetPendingRequests()
+        {
+            // Kiolvassuk a bejelentkezett Host ID-ját a Claims-bõl
+            var hostId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
+
+            if (hostId == 0) return Unauthorized();
+
+            var requests = await _bookingService.GetPendingBookingsForHostAsync(hostId);
+            return Ok(requests);
+        }
     }
 }

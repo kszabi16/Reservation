@@ -1,4 +1,5 @@
 using Reservation.DataContext.Dtos;
+using Reservation.DataContext.Entities;
 
 namespace Reservation.Service.Interfaces
 {
@@ -14,7 +15,7 @@ namespace Reservation.Service.Interfaces
         Task<bool> EmailExistsAsync(string email);
         Task<bool> UsernameExistsAsync(string username);
         Task SetTrustedStatusAsync(int userId, bool isTrusted);
-
+        Task<bool> UpdateUserRoleAsync(int id, RoleType newRole);
         Task<UserDto?> UpdateUserProfileAsync(int id, UpdateUserProfileDto profileDto);
 
     }

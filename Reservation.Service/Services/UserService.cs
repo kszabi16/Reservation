@@ -121,5 +121,15 @@ namespace Reservation.Service.Services
             return _mapper.Map<UserDto>(user);
         }
 
+        public async Task<bool> UpdateUserRoleAsync(int id, RoleType newRole)
+        {
+            var user = await _context.Users.FindAsync(id);
+            if (user == null) return false;
+
+            user.Role = newRole;
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
     }
 }

@@ -18,7 +18,7 @@ namespace Reservation.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpGet]
+        [HttpGet("get-all")]
         public async Task<ActionResult<IEnumerable<UserDto>>> GetAllUsers()
         {
             var users = await _userService.GetAllUsersAsync();
@@ -55,7 +55,7 @@ namespace Reservation.Controllers
         }
 
         [Authorize]
-        [HttpPut("profile")]
+        [HttpPut("update-profile")]
         public async Task<ActionResult<UserDto>> UpdateMyProfile([FromBody] UpdateUserProfileDto request)
         {
             var currentUserId = GetCurrentUserId(); 
@@ -68,17 +68,26 @@ namespace Reservation.Controllers
             return Ok(updatedUser);
         }
 
-        
-        [AllowAnonymous]
-        [HttpPost]
+
+        [Authorize(Roles = "Admin")]
+        [HttpPost("create")]
         public async Task<ActionResult<UserDto>> CreateUser([FromBody] CreateUserDto createUserDto)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
-            var user = await _userService.CreateUserAsync(createUserDto);
-            return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+
+            try
+            {
+                var user = await _userService.CreateUserAsync(createUserDto);
+                return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
+            }
+            catch (InvalidOperationException ex)
+            {
+                // Ha foglalt az email vagy a név, ezt a konkrét hibaüzenetet küldjük vissza!
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
-        [Authorize(Roles = "Guest,Host,Admin")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("{id}")]
         public async Task<ActionResult<UserDto>> UpdateUser(int id, [FromBody] CreateUserDto updateUserDto)
         {
@@ -97,7 +106,7 @@ namespace Reservation.Controllers
         }
 
         [Authorize(Roles = "Admin")]
-        [HttpDelete("{id}")]
+        [HttpDelete("delete/{id}")]
         public async Task<ActionResult> DeleteUser(int id)
         {
             var result = await _userService.DeleteUserAsync(id);
@@ -122,5 +131,16 @@ namespace Reservation.Controllers
             if (string.IsNullOrEmpty(idClaim)) return 0;
             return int.Parse(idClaim);
         }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("update-role/{id}")]
+        public async Task<IActionResult> UpdateUserRole(int id, [FromBody] UpdateRoleDto dto)
+        {
+            var success = await _userService.UpdateUserRoleAsync(id, dto.Role);
+            if (!success) return NotFound("Felhasználó nem található.");
+
+            return Ok(new { message = "Szerepkör sikeresen frissítve!" });
+        }
+
     }
 }

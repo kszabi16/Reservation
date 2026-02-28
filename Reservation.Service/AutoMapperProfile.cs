@@ -77,6 +77,13 @@ namespace Reservation.Service.AutoMapper
                 .ForMember(dest => dest.ApprovedAt, opt => opt.MapFrom(src => src.ApprovedAt));
 
             CreateMap<CreateHostRequestDto, HostRequest>();
+
+            CreateMap<Rating, RatingDto>();
+            CreateMap<CreateRatingDto, Rating>()
+                .ForMember(dest => dest.User, opt => opt.Ignore())
+                .ForMember(dest => dest.Property, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
+                .ForMember(dest => dest.Deleted, opt => opt.Ignore());
         }
     }
 }

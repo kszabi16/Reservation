@@ -14,5 +14,7 @@ namespace Reservation.Service.Interfaces
         Task<IEnumerable<PropertyDto>> GetPropertiesByPriceRangeAsync(decimal minPrice, decimal maxPrice);
         Task<IEnumerable<PropertyDto>> GetPropertiesByCapacityAsync(int minCapacity);
         Task<IEnumerable<PropertyDto>> GetAllPropertiesForAdminAsync();
+        Task<IEnumerable<PropertyDto>> GetPendingPropertiesAsync();
+        Task<bool> ApprovePropertyAsync(int id);
     }
 }

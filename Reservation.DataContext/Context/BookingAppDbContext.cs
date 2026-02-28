@@ -13,6 +13,7 @@ namespace Reservation.DataContext.Context
         public DbSet<Like> Likes { get; set; }
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<HostRequest> HostRequests { get; set; }
+        public DbSet<Rating> Ratings { get; set; }
 
 
         public ReservationDbContext(DbContextOptions<ReservationDbContext> options) : base(options)
@@ -74,6 +75,8 @@ namespace Reservation.DataContext.Context
                 .HasForeignKey(r => r.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            modelBuilder.Entity<Rating>()
+                .HasQueryFilter(e => !e.Deleted);
 
 
 
@@ -87,7 +90,8 @@ namespace Reservation.DataContext.Context
                    PricePerNight = 25000m,
                    Capacity = 3,
                    CreatedAt = new DateTime(2024, 10, 14),
-                   HostId = 2 
+                   HostId = 2 ,
+                   IsApproved = true
                },
                new Property
                {
@@ -98,7 +102,8 @@ namespace Reservation.DataContext.Context
                    PricePerNight = 45000m,
                    Capacity = 6,
                    CreatedAt = new DateTime(2024, 10, 14),
-                   HostId = 2
+                   HostId = 2, 
+                   IsApproved = true
                },
                new Property
                {
@@ -109,7 +114,8 @@ namespace Reservation.DataContext.Context
                    PricePerNight = 32000m,
                    Capacity = 5,
                    CreatedAt = new DateTime(2024,10,14),
-                   HostId =2 
+                   HostId = 2 ,
+                   IsApproved = true
                }
            );
             modelBuilder.Entity<User>().HasData(

@@ -121,5 +121,24 @@ namespace Reservation.Controllers
             return Ok(properties);
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpGet("pending")]
+        public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPendingProperties()
+        {
+            var properties = await _propertyService.GetPendingPropertiesAsync();
+            return Ok(properties);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/approve")]
+        public async Task<IActionResult> ApproveProperty(int id)
+        {
+            var success = await _propertyService.ApprovePropertyAsync(id);
+            if (!success)
+                return NotFound(new { message = "Ingatlan nem található." });
+
+            return Ok(new { message = "Szállás sikeresen jóváhagyva!" });
+        }
+
     }
 }

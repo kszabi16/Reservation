@@ -16,23 +16,27 @@ namespace Reservation.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<AuthResponseDto>> Register([FromBody] RegisterDto registerDto)
+        public async Task<IActionResult> Register([FromBody] RegisterDto dto)
         {
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
+
             try
             {
-                if (!ModelState.IsValid)
-                    return BadRequest(ModelState);
-
-                var result = await _authService.RegisterAsync(registerDto);
-                return Ok(result);
+                // Megpróbáljuk beregisztrálni
+                var user = await _authService.RegisterAsync(dto); // vagy ahogy nálad hívják a metódust
+                return Ok(new { message = "Sikeres regisztráció!" });
             }
             catch (InvalidOperationException ex)
             {
+                // HA LÉTEZIK MÁR AZ EMAIL VAGY USERNAME, ITT KAPJUK EL!
+                // Visszaadunk egy 400 Bad Request-et a konkrét hibaüzenettel.
                 return BadRequest(new { message = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(500, new { message = $"Internal server error: {ex.Message}" });
+                // Bármilyen egyéb váratlan hiba
+                return StatusCode(500, new { message = "Belsõ szerverhiba történt a regisztráció során." });
             }
         }
 

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Reservation.DataContext.Context;
 
@@ -11,9 +12,11 @@ using Reservation.DataContext.Context;
 namespace Reservation.Migrations
 {
     [DbContext(typeof(ReservationDbContext))]
-    partial class ReservationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260227181523_Rating")]
+    partial class Rating
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -281,6 +284,38 @@ namespace Reservation.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Reservation.DataContext.Entities.Rating", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("Deleted")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("PropertyId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Score")
+                        .HasColumnType("int");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PropertyId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Ratings");
+                });
+
             modelBuilder.Entity("Reservation.DataContext.Entities.User", b =>
                 {
                     b.Property<int>("Id")
@@ -288,6 +323,15 @@ namespace Reservation.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AvatarUrl")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Bio")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
 
                     b.Property<bool>("Deleted")
                         .HasColumnType("bit");
@@ -299,8 +343,14 @@ namespace Reservation.Migrations
                     b.Property<bool>("IsTrustedHost")
                         .HasColumnType("bit");
 
+                    b.Property<string>("Location")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PasswordHash")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PhoneNumber")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Role")
@@ -318,6 +368,7 @@ namespace Reservation.Migrations
                         new
                         {
                             Id = 1,
+                            CreatedAt = new DateTime(2026, 2, 27, 18, 15, 23, 155, DateTimeKind.Utc).AddTicks(9282),
                             Deleted = false,
                             Email = "bela@example.com",
                             IsTrustedHost = false,
@@ -328,6 +379,7 @@ namespace Reservation.Migrations
                         new
                         {
                             Id = 2,
+                            CreatedAt = new DateTime(2026, 2, 27, 18, 15, 23, 155, DateTimeKind.Utc).AddTicks(9930),
                             Deleted = false,
                             Email = "anna@example.com",
                             IsTrustedHost = false,
@@ -445,6 +497,25 @@ namespace Reservation.Migrations
                     b.Navigation("Host");
                 });
 
+            modelBuilder.Entity("Reservation.DataContext.Entities.Rating", b =>
+                {
+                    b.HasOne("Reservation.DataContext.Entities.Property", "Property")
+                        .WithMany("Ratings")
+                        .HasForeignKey("PropertyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Reservation.DataContext.Entities.User", "User")
+                        .WithMany("Ratings")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Property");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("Reservation.DataContext.Entities.Property", b =>
                 {
                     b.Navigation("Bookings");
@@ -454,6 +525,8 @@ namespace Reservation.Migrations
                     b.Navigation("Favorites");
 
                     b.Navigation("Likes");
+
+                    b.Navigation("Ratings");
                 });
 
             modelBuilder.Entity("Reservation.DataContext.Entities.User", b =>
@@ -467,6 +540,8 @@ namespace Reservation.Migrations
                     b.Navigation("Likes");
 
                     b.Navigation("Properties");
+
+                    b.Navigation("Ratings");
                 });
 #pragma warning restore 612, 618
         }
