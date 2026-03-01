@@ -92,7 +92,7 @@ namespace Reservation
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IHostRequestService, HostRequestService>();
             builder.Services.AddScoped<IRatingService, RatingService>();
-
+            builder.Services.AddScoped<Reservation.Service.Services.GoogleDriveService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>

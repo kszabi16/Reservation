@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Reservation.DataContext.Dtos;
 using Reservation.Service.Interfaces;
+using Reservation.Service.Services;
 using System.Security.Claims;
 
 namespace Reservation.Controllers
@@ -36,6 +37,7 @@ namespace Reservation.Controllers
                 return NotFound($"Property with ID {id} not found.");
             return Ok(property);
         }
+
 
         [Authorize]
         [HttpPost]
@@ -138,6 +140,18 @@ namespace Reservation.Controllers
                 return NotFound(new { message = "Ingatlan nem található." });
 
             return Ok(new { message = "Szállás sikeresen jóváhagyva!" });
+        }
+
+        [HttpPost("{propertyId}/upload-image")]
+        [Authorize]
+        public async Task<IActionResult> UploadImage(int propertyId, IFormFile file, [FromServices] GoogleDriveService driveService)
+        {
+            var property = await _propertyService.GetPropertyByIdAsync(propertyId);
+            if (property == null) return NotFound();
+
+            var imageUrl = await driveService.UploadImageAsync(file);
+            property.ImageUrl = imageUrl;
+            return Ok(new { ImageUrl = imageUrl });
         }
 
     }

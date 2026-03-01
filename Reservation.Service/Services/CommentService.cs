@@ -39,13 +39,25 @@ namespace Reservation.Service.Services
             if (string.IsNullOrWhiteSpace(createCommentDto.Content))
                 throw new InvalidOperationException("Comment content cannot be empty.");
 
+            // 1. Komment létrehozása
             var comment = _mapper.Map<Comment>(createCommentDto);
-
-            
             comment.UserId = userId;
             comment.CreatedAt = DateTime.UtcNow;
-
             _context.Comments.Add(comment);
+
+            // 2. ÚJ LOGIKA: Ha a felhasználó csillagot is adott, elmentjük a Rating táblába!
+            if (createCommentDto.Rating > 0)
+            {
+                var rating = new Rating
+                {
+                    PropertyId = createCommentDto.PropertyId,
+                    UserId = userId,
+                    Score = createCommentDto.Rating,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Ratings.Add(rating);
+            }
+
             await _context.SaveChangesAsync();
 
             return _mapper.Map<CommentDto>(comment);

@@ -11,6 +11,9 @@ namespace Reservation.DataContext.Dtos
         public decimal PricePerNight { get; set; }
         public int Capacity { get; set; }
         public int HostId { get; set; }
+        public double AverageRating { get; set; }
+        public int ReviewCount { get; set; }
+        public string? ImageUrl { get; set; }
     }
 
     public class CreatePropertyDto
@@ -20,7 +23,8 @@ namespace Reservation.DataContext.Dtos
         public string Location { get; set; } = null!;
         public decimal PricePerNight { get; set; }
         public int Capacity { get; set; }
-      
+        public string? ImageUrl { get; set; }
+
     }
 
 }

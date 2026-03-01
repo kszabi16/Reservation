@@ -9,6 +9,8 @@
         public int Capacity { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+        public string? ImageUrl { get; set; } 
+
         // Jóváhagyás státusza
         public bool IsApproved { get; set; } = false;
 

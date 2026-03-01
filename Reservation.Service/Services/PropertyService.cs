@@ -21,6 +21,7 @@ namespace Reservation.Service.Services
         public async Task<IEnumerable<PropertyDto>> GetAllPropertiesAsync()
         {
             var properties = await _context.Properties
+                .Include(p=>p.Ratings)
                 .Where(p => p.IsApproved)
                 .ToListAsync();
 
@@ -29,7 +30,9 @@ namespace Reservation.Service.Services
 
         public async Task<PropertyDto?> GetPropertyByIdAsync(int id)
         {
-            var property = await _context.Properties.FindAsync(id);
+            var property = await _context.Properties
+                .Include(p => p.Ratings) 
+                .FirstOrDefaultAsync(p => p.Id == id);
             return property == null ? null : _mapper.Map<PropertyDto>(property);
         }
 

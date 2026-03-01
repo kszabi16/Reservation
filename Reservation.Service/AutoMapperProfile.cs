@@ -27,7 +27,10 @@ namespace Reservation.Service.AutoMapper
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             // Property mappings
-            CreateMap<Property, PropertyDto>();
+            CreateMap<Property, PropertyDto>()
+                .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src =>
+        src.Ratings != null && src.Ratings.Any() ? src.Ratings.Average(r => r.Score) : 0));
+
             CreateMap<CreatePropertyDto, Property>()
                 .ForMember(dest => dest.Host, opt => opt.Ignore())
                 .ForMember(dest => dest.Bookings, opt => opt.Ignore())
@@ -85,5 +88,6 @@ namespace Reservation.Service.AutoMapper
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
         }
+
     }
 }

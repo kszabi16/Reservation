@@ -81,43 +81,44 @@ namespace Reservation.DataContext.Context
 
 
             modelBuilder.Entity<Property>().HasData(
-               new Property
-               {
-                   Id = 1,
-                   Title = "Budapest belvárosi apartman",
-                   Description = "Modern apartman a Deák tér közelében, remek kilátással.",
-                   Location = "Budapest",
-                   PricePerNight = 25000m,
-                   Capacity = 3,
-                   CreatedAt = new DateTime(2024, 10, 14),
-                   HostId = 2 ,
-                   IsApproved = true
-               },
-               new Property
-               {
-                   Id = 2,
-                   Title = "Balatoni nyaraló",
-                   Description = "Kényelmes ház közvetlenül a Balaton partján.",
-                   Location = "Siófok",
-                   PricePerNight = 45000m,
-                   Capacity = 6,
-                   CreatedAt = new DateTime(2024, 10, 14),
-                   HostId = 2, 
-                   IsApproved = true
-               },
-               new Property
-               {
-                   Id = 3,
-                   Title = "Hegyi faház Mátrában",
-                   Description = "Hangulatos faház kandallóval és panorámás terasszal.",
-                   Location = "Mátraháza",
-                   PricePerNight = 32000m,
-                   Capacity = 5,
-                   CreatedAt = new DateTime(2024,10,14),
-                   HostId = 2 ,
-                   IsApproved = true
-               }
-           );
+                new Property
+                {
+                    Id = 1,
+                    Title = "Budapest belvárosi apartman",
+                    Description = "Modern apartman a Deák tér közelében, remek kilátással.",
+                    Location = "Budapest",
+                    PricePerNight = 25000m,
+                    Capacity = 3,
+                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc), // FIX UTC DÁTUM
+                    HostId = 2,
+                    IsApproved = true
+                },
+                new Property
+                {
+                    Id = 2,
+                    Title = "Balatoni nyaraló",
+                    Description = "Kényelmes ház közvetlenül a Balaton partján.",
+                    Location = "Siófok",
+                    PricePerNight = 45000m,
+                    Capacity = 6,
+                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc), // FIX UTC DÁTUM
+                    HostId = 2,
+                    IsApproved = true
+                },
+                new Property
+                {
+                    Id = 3,
+                    Title = "Hegyi faház Mátrában",
+                    Description = "Hangulatos faház kandallóval és panorámás terasszal.",
+                    Location = "Mátraháza",
+                    PricePerNight = 32000m,
+                    Capacity = 5,
+                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc), // FIX UTC DÁTUM
+                    HostId = 2,
+                    IsApproved = true
+                }
+            );
+
             modelBuilder.Entity<User>().HasData(
                 new User
                 {
@@ -125,7 +126,8 @@ namespace Reservation.DataContext.Context
                     Username = "Kovács Béla",
                     Email = "bela@example.com",
                     PasswordHash = "hashed_pw",
-                    Role = RoleType.Host
+                    Role = RoleType.Host,
+                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc) // EZ HIÁNYZOTT!
                 },
                 new User
                 {
@@ -133,7 +135,8 @@ namespace Reservation.DataContext.Context
                     Username = "Tóth Anna",
                     Email = "anna@example.com",
                     PasswordHash = "hashed_pw",
-                    Role = RoleType.Host
+                    Role = RoleType.Host,
+                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc) // EZ HIÁNYZOTT!
                 }
             );
 

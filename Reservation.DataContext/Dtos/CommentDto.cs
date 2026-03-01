@@ -17,7 +17,9 @@ namespace Reservation.DataContext.Dtos
     {
         public string Content { get; set; } = null!;
         public int PropertyId { get; set; }
-        
+        public int Rating { get; set; }
+
+
     }
 
 }
