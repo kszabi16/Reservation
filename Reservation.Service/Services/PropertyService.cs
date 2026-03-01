@@ -164,5 +164,20 @@ namespace Reservation.Service.Services
 
             return true;
         }
+
+        public async Task<bool> UpdateImageUrlAsync(int propertyId, string imageUrl)
+        {
+            
+            var property = await _context.Properties.FindAsync(propertyId);
+            if (property == null) return false;
+
+            
+            property.ImageUrl = imageUrl;
+
+           
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

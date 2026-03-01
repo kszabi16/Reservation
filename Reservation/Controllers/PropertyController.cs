@@ -143,15 +143,39 @@ namespace Reservation.Controllers
         }
 
         [HttpPost("{propertyId}/upload-image")]
-        [Authorize]
-        public async Task<IActionResult> UploadImage(int propertyId, IFormFile file, [FromServices] GoogleDriveService driveService)
+        //[Authorize]
+        public async Task<IActionResult> UploadImage(int propertyId, IFormFile? file, [FromServices] ImageUploadService uploadService)
         {
-            var property = await _propertyService.GetPropertyByIdAsync(propertyId);
-            if (property == null) return NotFound();
+            try
+            {
+                var actualFile = file ?? Request.Form.Files.FirstOrDefault();
+                if (actualFile == null || actualFile.Length == 0)
+                    return BadRequest("Nem érkezett fájl.");
 
-            var imageUrl = await driveService.UploadImageAsync(file);
-            property.ImageUrl = imageUrl;
-            return Ok(new { ImageUrl = imageUrl });
+                var property = await _propertyService.GetPropertyByIdAsync(propertyId);
+                if (property == null) return NotFound("Ingatlan nem található.");
+
+                // Az új szervizt hívjuk meg
+                var imageUrl = await uploadService.UploadImageAsync(actualFile);
+
+                var updateDto = new CreatePropertyDto
+                {
+                    Title = property.Title,
+                    Description = property.Description,
+                    Location = property.Location,
+                    PricePerNight = property.PricePerNight,
+                    Capacity = property.Capacity,
+                    ImageUrl = imageUrl
+                };
+
+                await _propertyService.UpdatePropertyAsync(propertyId, updateDto);
+
+                return Ok(new { ImageUrl = imageUrl });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Hiba: {ex.Message}");
+            }
         }
 
     }
