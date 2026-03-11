@@ -23,6 +23,7 @@ namespace Reservation.Service.Services
             var properties = await _context.Properties
                 .Include(p=>p.Ratings)
                 .Where(p => p.IsApproved)
+                .Include(p => p.Images)
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<PropertyDto>>(properties);
@@ -31,7 +32,8 @@ namespace Reservation.Service.Services
         public async Task<PropertyDto?> GetPropertyByIdAsync(int id)
         {
             var property = await _context.Properties
-                .Include(p => p.Ratings) 
+                .Include(p => p.Ratings)
+                .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == id);
             return property == null ? null : _mapper.Map<PropertyDto>(property);
         }
@@ -165,18 +167,29 @@ namespace Reservation.Service.Services
             return true;
         }
 
-        public async Task<bool> UpdateImageUrlAsync(int propertyId, string imageUrl)
+        public async Task<bool> AddPropertyImagesAsync(int propertyId, List<string> imageUrls)
         {
-            
             var property = await _context.Properties.FindAsync(propertyId);
             if (property == null) return false;
 
             
-            property.ImageUrl = imageUrl;
+            foreach (var url in imageUrls)
+            {
+                var propertyImage = new PropertyImage
+                {
+                    ImageUrl = url,
+                    PropertyId = propertyId
+                };
+                _context.PropertyImages.Add(propertyImage);
+            }
 
-           
+         
+            if (string.IsNullOrEmpty(property.ImageUrl) && imageUrls.Any())
+            {
+                property.ImageUrl = imageUrls.First();
+            }
+
             await _context.SaveChangesAsync();
-
             return true;
         }
     }

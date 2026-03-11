@@ -142,5 +142,14 @@ namespace Reservation.Controllers
             return Ok(new { message = "Szerepkör sikeresen frissítve!" });
         }
 
+        [Authorize(Roles = "Admin")]
+        [HttpPut("{id}/toggle-trusted")]
+        public async Task<IActionResult> ToggleTrustedHost(int id)
+        {
+            var success = await _userService.ToggleTrustedHostAsync(id);
+            if (!success) return NotFound("Felhasználó nem található.");
+            return Ok();
+        }
+
     }
 }

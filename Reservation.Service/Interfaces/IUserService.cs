@@ -17,6 +17,7 @@ namespace Reservation.Service.Interfaces
         Task SetTrustedStatusAsync(int userId, bool isTrusted);
         Task<bool> UpdateUserRoleAsync(int id, RoleType newRole);
         Task<UserDto?> UpdateUserProfileAsync(int id, UpdateUserProfileDto profileDto);
+        Task<bool> ToggleTrustedHostAsync(int userId);
 
     }
 }

@@ -28,8 +28,10 @@ namespace Reservation.Service.AutoMapper
 
             // Property mappings
             CreateMap<Property, PropertyDto>()
-                .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src =>
-        src.Ratings != null && src.Ratings.Any() ? src.Ratings.Average(r => r.Score) : 0));
+            .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src =>
+                src.Ratings != null && src.Ratings.Any() ? src.Ratings.Average(r => r.Score) : 0))
+            // EZT A SORT ADD HOZZÁ:
+            .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl).ToList()));
 
             CreateMap<CreatePropertyDto, Property>()
                 .ForMember(dest => dest.Host, opt => opt.Ignore())
@@ -87,6 +89,8 @@ namespace Reservation.Service.AutoMapper
                 .ForMember(dest => dest.Property, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
+
+            CreateMap<SystemLog, SystemLogDto>();
         }
 
     }

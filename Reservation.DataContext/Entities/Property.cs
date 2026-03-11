@@ -9,7 +9,8 @@
         public int Capacity { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
-        public string? ImageUrl { get; set; } 
+        public string? ImageUrl { get; set; }
+        public ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
 
         // Jóváhagyás státusza
         public bool IsApproved { get; set; } = false;

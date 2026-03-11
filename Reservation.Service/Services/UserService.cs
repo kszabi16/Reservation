@@ -130,6 +130,16 @@ namespace Reservation.Service.Services
             await _context.SaveChangesAsync();
             return true;
         }
+        public async Task<bool> ToggleTrustedHostAsync(int userId)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return false;
 
+            // Megfordítjuk a jelenlegi állapotot (ha false volt, true lesz, és fordítva)
+            user.IsTrustedHost = !user.IsTrustedHost;
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
     }
 }

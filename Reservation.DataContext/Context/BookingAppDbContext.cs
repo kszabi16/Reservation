@@ -14,6 +14,9 @@ namespace Reservation.DataContext.Context
         public DbSet<Favorite> Favorites { get; set; }
         public DbSet<HostRequest> HostRequests { get; set; }
         public DbSet<Rating> Ratings { get; set; }
+        public DbSet<PropertyImage> PropertyImages { get; set; }
+
+        public DbSet<SystemLog> SystemLogs { get; set; }
 
 
         public ReservationDbContext(DbContextOptions<ReservationDbContext> options) : base(options)
@@ -32,11 +35,12 @@ namespace Reservation.DataContext.Context
             modelBuilder.Entity<Comment>().HasQueryFilter(e => !e.Deleted);
             modelBuilder.Entity<Favorite>().HasQueryFilter(e => !e.Deleted);
             modelBuilder.Entity<Like>().HasQueryFilter(e => !e.Deleted);
+            modelBuilder.Entity<PropertyImage>().HasQueryFilter(e => !e.Deleted);
 
-            // Foreign Key konfiguráció cascade delete konfliktusok elkerülésére
-            
-            // Booking -> Guest kapcsolat (NoAction a cascade konfliktus elkerülésére)
-            modelBuilder.Entity<Booking>()
+        // Foreign Key konfiguráció cascade delete konfliktusok elkerülésére
+
+        // Booking -> Guest kapcsolat (NoAction a cascade konfliktus elkerülésére)
+        modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Guest)
                 .WithMany(u => u.Bookings)
                 .HasForeignKey(b => b.GuestId)

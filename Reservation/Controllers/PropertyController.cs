@@ -123,6 +123,36 @@ namespace Reservation.Controllers
             return Ok(properties);
         }
 
+        [HttpPost("{propertyId}/upload-images")]
+        //[Authorize]
+        public async Task<IActionResult> UploadImages(int propertyId, IEnumerable<IFormFile> files, [FromServices] ImageUploadService uploadService)
+        {
+            try
+            {
+                if (files == null || !files.Any())
+                    return BadRequest("Nem érkezett fájl.");
+
+                var imageUrls = new List<string>();
+
+                // Ciklusban feltöltjük az összes képet az ImgBB-re
+                foreach (var file in files)
+                {
+                    var url = await uploadService.UploadImageAsync(file);
+                    imageUrls.Add(url);
+                }
+
+                // Elmentjük az összes URL-t az adatbázisba az új metódussal
+                var success = await _propertyService.AddPropertyImagesAsync(propertyId, imageUrls);
+
+                if (!success) return NotFound("Ingatlan nem található.");
+
+                return Ok(new { ImageUrls = imageUrls });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Hiba a feltöltés során: {ex.Message}");
+            }
+        }
         [Authorize(Roles = "Admin")]
         [HttpGet("pending")]
         public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPendingProperties()
@@ -136,46 +166,8 @@ namespace Reservation.Controllers
         public async Task<IActionResult> ApproveProperty(int id)
         {
             var success = await _propertyService.ApprovePropertyAsync(id);
-            if (!success)
-                return NotFound(new { message = "Ingatlan nem található." });
-
-            return Ok(new { message = "Szállás sikeresen jóváhagyva!" });
-        }
-
-        [HttpPost("{propertyId}/upload-image")]
-        //[Authorize]
-        public async Task<IActionResult> UploadImage(int propertyId, IFormFile? file, [FromServices] ImageUploadService uploadService)
-        {
-            try
-            {
-                var actualFile = file ?? Request.Form.Files.FirstOrDefault();
-                if (actualFile == null || actualFile.Length == 0)
-                    return BadRequest("Nem érkezett fájl.");
-
-                var property = await _propertyService.GetPropertyByIdAsync(propertyId);
-                if (property == null) return NotFound("Ingatlan nem található.");
-
-                // Az új szervizt hívjuk meg
-                var imageUrl = await uploadService.UploadImageAsync(actualFile);
-
-                var updateDto = new CreatePropertyDto
-                {
-                    Title = property.Title,
-                    Description = property.Description,
-                    Location = property.Location,
-                    PricePerNight = property.PricePerNight,
-                    Capacity = property.Capacity,
-                    ImageUrl = imageUrl
-                };
-
-                await _propertyService.UpdatePropertyAsync(propertyId, updateDto);
-
-                return Ok(new { ImageUrl = imageUrl });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Hiba: {ex.Message}");
-            }
+            if (!success) return NotFound();
+            return Ok();
         }
 
     }

@@ -14,6 +14,8 @@ namespace Reservation.DataContext.Dtos
         public double AverageRating { get; set; }
         public int ReviewCount { get; set; }
         public string? ImageUrl { get; set; }
+
+        public List<string> ImageUrls { get; set; } = new List<string>();
     }
 
     public class CreatePropertyDto

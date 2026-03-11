@@ -16,6 +16,6 @@ namespace Reservation.Service.Interfaces
         Task<IEnumerable<PropertyDto>> GetAllPropertiesForAdminAsync();
         Task<IEnumerable<PropertyDto>> GetPendingPropertiesAsync();
         Task<bool> ApprovePropertyAsync(int id);
-        Task<bool> UpdateImageUrlAsync(int propertyId, string imageUrl);
+        Task<bool> AddPropertyImagesAsync(int propertyId, List<string> imageUrls);
     }
 }
