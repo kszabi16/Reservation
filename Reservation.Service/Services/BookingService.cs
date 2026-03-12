@@ -46,17 +46,15 @@ namespace Reservation.Service.Services
             if (createBookingDto.StartDate < DateTime.Today)
                 throw new InvalidOperationException("Cannot book for past dates.");
 
-            // Ellenőrizzük, hogy nincs-e ütközés más foglalásokkal
             var conflictingBookings = await _context.Bookings
                 .Where(b => b.PropertyId == createBookingDto.PropertyId &&
-                           b.Status != BookingStatus.Cancelled &&
-                           ((b.StartDate <= createBookingDto.StartDate && b.EndDate > createBookingDto.StartDate) ||
-                            (b.StartDate < createBookingDto.EndDate && b.EndDate >= createBookingDto.EndDate) ||
-                            (b.StartDate >= createBookingDto.StartDate && b.EndDate <= createBookingDto.EndDate)))
+                            b.Status != BookingStatus.Cancelled &&
+                            b.StartDate < createBookingDto.EndDate &&
+                            b.EndDate > createBookingDto.StartDate)
                 .AnyAsync();
 
             if (conflictingBookings)
-                throw new InvalidOperationException("Property is not available for the selected dates.");
+                throw new InvalidOperationException("Sajnos ez az ingatlan már foglalt a kiválasztott időpontban.");
 
             var booking = _mapper.Map<Booking>(createBookingDto);
             _context.Bookings.Add(booking);
@@ -171,7 +169,7 @@ namespace Reservation.Service.Services
         public async Task<IEnumerable<BookingDto>> GetPendingBookingsForHostAsync(int hostId)
         {
             var pendingBookings = await _context.Bookings
-                .Include(b => b.Property) // Be kell emelni az ingatlant, hogy tudjuk, ki a tulaj
+                .Include(b => b.Property)
                 .Where(b => b.Property.HostId == hostId && b.Status == BookingStatus.Pending)
                 .ToListAsync();
 

@@ -1,10 +1,11 @@
 using AutoMapper;
+using BCrypt.Net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Reservation.DataContext.Context;
 using Reservation.DataContext.Dtos;
 using Reservation.DataContext.Entities;
 using Reservation.Service.Interfaces;
-using BCrypt.Net;
 
 namespace Reservation.Service.Services
 {
@@ -140,6 +141,28 @@ namespace Reservation.Service.Services
             await _context.SaveChangesAsync();
 
             return true;
+        }
+        public async Task<string> UpdateAvatarAsync(int userId, IFormFile file)
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) throw new Exception("Felhasználó nem található");
+
+            
+            var fileName = $"avatar_{userId}{Path.GetExtension(file.FileName)}";
+            var filePath = Path.Combine("wwwroot/uploads/avatars", fileName);
+
+            
+            Directory.CreateDirectory(Path.GetDirectoryName(filePath)!);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            user.AvatarUrl = $"/uploads/avatars/{fileName}";
+            await _context.SaveChangesAsync();
+
+            return user.AvatarUrl;
         }
     }
 }

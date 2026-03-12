@@ -16,6 +16,9 @@ namespace Reservation.DataContext.Dtos
         public string? ImageUrl { get; set; }
 
         public List<string> ImageUrls { get; set; } = new List<string>();
+        public bool IsApproved { get; set; }
+
+        public List<string> Amenities { get; set; } = new List<string>();
     }
 
     public class CreatePropertyDto

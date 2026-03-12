@@ -26,11 +26,9 @@ namespace Reservation.Service.AutoMapper
             CreateMap<UpdateUserProfileDto, User>()
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
-            // Property mappings
             CreateMap<Property, PropertyDto>()
             .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src =>
                 src.Ratings != null && src.Ratings.Any() ? src.Ratings.Average(r => r.Score) : 0))
-            // EZT A SORT ADD HOZZÁ:
             .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl).ToList()));
 
             CreateMap<CreatePropertyDto, Property>()
@@ -42,7 +40,6 @@ namespace Reservation.Service.AutoMapper
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
 
-            // Booking mappings
             CreateMap<Booking, BookingDto>();
             CreateMap<CreateBookingDto, Booking>()
                 .ForMember(dest => dest.Property, opt => opt.Ignore())
@@ -51,15 +48,14 @@ namespace Reservation.Service.AutoMapper
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
 
-            // Comment mappings
-            CreateMap<Comment, CommentDto>();
+            CreateMap<Comment, CommentDto>()
+                .ForMember(dest => dest.UserAvatarUrl, opt => opt.MapFrom(src => src.User.AvatarUrl));
             CreateMap<CreateCommentDto, Comment>()
                 .ForMember(dest => dest.User, opt => opt.Ignore())
                 .ForMember(dest => dest.Property, opt => opt.Ignore())
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
 
-            // Favorite mappings
             CreateMap<Favorite, FavoriteDto>();
             CreateMap<CreateFavoriteDto, Favorite>()
                 .ForMember(dest => dest.User, opt => opt.Ignore())
@@ -67,7 +63,6 @@ namespace Reservation.Service.AutoMapper
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
 
-            // Like mappings
             CreateMap<Like, LikeDto>();
             CreateMap<CreateLikeDto, Like>()
                 .ForMember(dest => dest.User, opt => opt.Ignore())
@@ -91,6 +86,12 @@ namespace Reservation.Service.AutoMapper
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
 
             CreateMap<SystemLog, SystemLogDto>();
+
+            CreateMap<Property, PropertyDto>()
+            // Megmondjuk az AutoMappernek, hogyan töltse fel az Amenities listát:
+            .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src =>
+                src.PropertyAmenities.Select(pa => pa.Amenity.Name).ToList()
+            ));
         }
 
     }

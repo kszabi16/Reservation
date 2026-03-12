@@ -151,5 +151,14 @@ namespace Reservation.Controllers
             return Ok();
         }
 
+        [Authorize]
+        [HttpPost("avatar")]
+        public async Task<IActionResult> UploadAvatar(IFormFile file)
+        {
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value!);
+            var url = await _userService.UpdateAvatarAsync(userId, file);
+            return Ok(new { avatarUrl = url });
+        }
+
     }
 }

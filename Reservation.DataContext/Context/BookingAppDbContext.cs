@@ -15,7 +15,8 @@ namespace Reservation.DataContext.Context
         public DbSet<HostRequest> HostRequests { get; set; }
         public DbSet<Rating> Ratings { get; set; }
         public DbSet<PropertyImage> PropertyImages { get; set; }
-
+        public DbSet<Amenity> Amenities { get; set; }
+        public DbSet<PropertyAmenity> PropertyAmenities { get; set; }
         public DbSet<SystemLog> SystemLogs { get; set; }
 
 
@@ -82,7 +83,39 @@ namespace Reservation.DataContext.Context
             modelBuilder.Entity<Rating>()
                 .HasQueryFilter(e => !e.Deleted);
 
+            modelBuilder.Entity<PropertyAmenity>()
+            .HasKey(pa => new { pa.PropertyId, pa.AmenityId });
 
+            // 2. Kapcsolat az Ingatlan (Property) felé
+            modelBuilder.Entity<PropertyAmenity>()
+                .HasOne(pa => pa.Property)
+                .WithMany(p => p.PropertyAmenities)
+                .HasForeignKey(pa => pa.PropertyId);
+
+            // 3. Kapcsolat a Felszereltség (Amenity) felé
+            modelBuilder.Entity<PropertyAmenity>()
+                .HasOne(pa => pa.Amenity)
+                .WithMany(a => a.PropertyAmenities)
+                .HasForeignKey(pa => pa.AmenityId);
+
+            // Opcionális: Alapértelmezett adatok (Seeding) betöltése, hogy ne legyen üres a szótár
+            modelBuilder.Entity<Amenity>().HasData(
+                new Amenity { Id = 1, Name = "Wifi" },
+                new Amenity { Id = 2, Name = "Klíma" },
+                new Amenity { Id = 3, Name = "Ingyenes parkolás" },
+                new Amenity { Id = 4, Name = "Szauna" },
+                new Amenity { Id = 5, Name = "Állatbarát" }, 
+                new Amenity { Id = 6, Name = "Medence" },
+                new Amenity { Id = 7, Name = "Pezsgőfürdő (Jakuzzi)" },
+                new Amenity { Id = 8, Name = "Erkély / Terasz" },
+                new Amenity { Id = 9, Name = "Felszerelt konyha" },
+                new Amenity { Id = 10, Name = "Mosógép" },
+                new Amenity { Id = 11, Name = "Okostévé (Netflix, stb.)" },
+                new Amenity { Id = 12, Name = "Kert" },
+                new Amenity { Id = 13, Name = "Grillezési lehetőség" },
+                new Amenity { Id = 14, Name = "Reggeli biztosított" },
+                new Amenity { Id = 15, Name = "Elektromos autó töltő" }
+                    );
 
             modelBuilder.Entity<Property>().HasData(
                 new Property

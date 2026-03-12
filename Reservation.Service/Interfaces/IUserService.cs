@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Http;
 using Reservation.DataContext.Dtos;
 using Reservation.DataContext.Entities;
 
@@ -18,6 +19,7 @@ namespace Reservation.Service.Interfaces
         Task<bool> UpdateUserRoleAsync(int id, RoleType newRole);
         Task<UserDto?> UpdateUserProfileAsync(int id, UpdateUserProfileDto profileDto);
         Task<bool> ToggleTrustedHostAsync(int userId);
+        Task<string> UpdateAvatarAsync(int userId, IFormFile file);
 
     }
 }

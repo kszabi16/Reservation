@@ -34,7 +34,10 @@ namespace Reservation.Service.Services
             var property = await _context.Properties
                 .Include(p => p.Ratings)
                 .Include(p => p.Images)
+                .Include(p => p.PropertyAmenities)
+                    .ThenInclude(pa => pa.Amenity)
                 .FirstOrDefaultAsync(p => p.Id == id);
+
             return property == null ? null : _mapper.Map<PropertyDto>(property);
         }
 
@@ -49,7 +52,7 @@ namespace Reservation.Service.Services
 
             if (user.Role == RoleType.Guest)
             {
-               
+
                 property.IsApproved = false;
 
                 _context.Properties.Add(property);
@@ -67,7 +70,7 @@ namespace Reservation.Service.Services
             }
             else if (user.Role == RoleType.Host && !user.IsTrustedHost)
             {
-                
+
                 property.IsApproved = false;
 
                 _context.Properties.Add(property);
@@ -75,7 +78,7 @@ namespace Reservation.Service.Services
             }
             else
             {
-                
+
                 property.IsApproved = true;
 
                 _context.Properties.Add(property);
@@ -191,6 +194,12 @@ namespace Reservation.Service.Services
 
             await _context.SaveChangesAsync();
             return true;
+        }
+         public async Task<IEnumerable<string>> GetAllAmenitiesAsync()
+        {
+            return await _context.Amenities
+                .Select(a => a.Name)
+                .ToListAsync();
         }
     }
 }

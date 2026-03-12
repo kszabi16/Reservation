@@ -1,9 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
 using Reservation.DataContext.Dtos;
 using Reservation.DataContext.Entities;
 using Reservation.Service.Interfaces;
+using System.Security.Claims;
 
 namespace Reservation.Controllers
 {
@@ -19,7 +20,22 @@ namespace Reservation.Controllers
             _bookingService = bookingService;
         }
 
-       
+        [Authorize(Roles = "Admin")] 
+        [HttpGet("get-all")]      
+        public async Task<IActionResult> GetAllBookings()
+        {
+            try
+            {
+                
+                var bookings = await _bookingService.GetAllBookingsAsync();
+                return Ok(bookings);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Belsõ szerverhiba történt: {ex.Message}");
+            }
+        }
+
         [Authorize(Roles = "Guest,Host,Admin")]
         [HttpGet("my-bookings")]
         public async Task<ActionResult<IEnumerable<BookingDto>>> GetMyBookings()
@@ -30,7 +46,7 @@ namespace Reservation.Controllers
         }
 
        
-        [Authorize(Roles = "Guest")]
+        [Authorize(Roles = "Guest,Host")]
         [HttpPost]
         public async Task<ActionResult<BookingDto>> CreateBooking([FromBody] CreateBookingDto dto)
         {
@@ -73,8 +89,9 @@ namespace Reservation.Controllers
             var bookings = await _bookingService.GetBookingsByPropertyIdAsync(propertyId);
             return Ok(bookings);
         }
+        
 
-       
+
         [Authorize(Roles = "Admin")]
         [HttpGet("status/{status}")]
         public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByStatus(BookingStatus status)

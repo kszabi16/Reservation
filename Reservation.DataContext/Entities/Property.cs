@@ -12,13 +12,11 @@
         public string? ImageUrl { get; set; }
         public ICollection<PropertyImage> Images { get; set; } = new List<PropertyImage>();
 
-        // Jóváhagyás státusza
         public bool IsApproved { get; set; } = false;
-
-        // Kapcsolatok
         public int HostId { get; set; }
         public User Host { get; set; } = null!;
 
+        public ICollection<PropertyAmenity> PropertyAmenities { get; set; } = new List<PropertyAmenity>();
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
         public ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public ICollection<Favorite> Favorites { get; set; } = new List<Favorite>();

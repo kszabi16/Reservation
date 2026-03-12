@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Reservation.DataContext.Dtos;
 using Reservation.Service.Interfaces;
 using Reservation.Service.Services;
@@ -27,7 +28,16 @@ namespace Reservation.Controllers
             return Ok(properties);
         }
 
-     
+
+        [AllowAnonymous]
+        [HttpGet("amenities")]
+        public async Task<ActionResult<IEnumerable<string>>> GetAllAmenities()
+        {
+          
+            var amenities = await _propertyService.GetAllAmenitiesAsync();
+            return Ok(amenities);
+        }
+
         [AllowAnonymous]
         [HttpGet("{id}")]
         public async Task<ActionResult<PropertyDto>> GetProperty(int id)
@@ -38,7 +48,6 @@ namespace Reservation.Controllers
             return Ok(property);
         }
 
-
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<PropertyDto>> CreateProperty([FromBody] CreatePropertyDto createPropertyDto)
@@ -48,7 +57,8 @@ namespace Reservation.Controllers
 
             var userId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
 
-            var property = await _propertyService.CreatePropertyAsync(userId,createPropertyDto);
+            var property = await _propertyService.CreatePropertyAsync(userId, createPropertyDto);
+
             return CreatedAtAction(nameof(GetProperty), new { id = property.Id }, property);
         }
 
@@ -169,6 +179,5 @@ namespace Reservation.Controllers
             if (!success) return NotFound();
             return Ok();
         }
-
     }
 }

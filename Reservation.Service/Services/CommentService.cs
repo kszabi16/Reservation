@@ -93,6 +93,7 @@ namespace Reservation.Service.Services
         public async Task<IEnumerable<CommentDto>> GetCommentsByPropertyIdAsync(int propertyId)
         {
             var comments = await _context.Comments
+                .Include(c => c.User)
                 .Where(c => c.PropertyId == propertyId)
                 .OrderBy(c => c.CreatedAt)
                 .ToListAsync();

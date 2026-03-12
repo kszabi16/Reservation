@@ -11,6 +11,8 @@ namespace Reservation.DataContext.Dtos
         public DateTime CreatedAt { get; set; }
         public int UserId { get; set; }
         public int PropertyId { get; set; }
+
+        public string? UserAvatarUrl { get; set; }
     }
 
     public class CreateCommentDto
