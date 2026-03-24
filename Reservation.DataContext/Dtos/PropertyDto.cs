@@ -30,6 +30,8 @@ namespace Reservation.DataContext.Dtos
         public int Capacity { get; set; }
         public string? ImageUrl { get; set; }
 
+        public List<string> Amenities { get; set; } = new List<string>();
+
     }
 
 }

@@ -88,7 +88,6 @@ namespace Reservation.Service.AutoMapper
             CreateMap<SystemLog, SystemLogDto>();
 
             CreateMap<Property, PropertyDto>()
-            // Megmondjuk az AutoMappernek, hogyan töltse fel az Amenities listát:
             .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src =>
                 src.PropertyAmenities.Select(pa => pa.Amenity.Name).ToList()
             ));

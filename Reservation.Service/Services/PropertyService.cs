@@ -85,6 +85,23 @@ namespace Reservation.Service.Services
                 await _context.SaveChangesAsync();
             }
 
+            if (dto.Amenities != null && dto.Amenities.Any())
+            {
+                var existingAmenities = await _context.Amenities
+                    .Where(a => dto.Amenities.Contains(a.Name))
+                    .ToListAsync();
+
+                foreach (var amenity in existingAmenities)
+                {
+                    _context.PropertyAmenities.Add(new PropertyAmenity
+                    {
+                        PropertyId = property.Id,
+                        AmenityId = amenity.Id
+                    });
+                }
+                await _context.SaveChangesAsync();
+            }
+
             return _mapper.Map<PropertyDto>(property);
         }
 
