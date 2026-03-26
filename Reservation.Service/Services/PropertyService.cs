@@ -23,6 +23,7 @@ namespace Reservation.Service.Services
             var properties = await _context.Properties
                 .Include(p=>p.Ratings)
                 .Where(p => p.IsApproved)
+                .Include(p => p.PropertyAmenities)
                 .Include(p => p.Images)
                 .ToListAsync();
 
@@ -82,8 +83,10 @@ namespace Reservation.Service.Services
                 property.IsApproved = true;
 
                 _context.Properties.Add(property);
-                await _context.SaveChangesAsync();
+               
             }
+
+            await _context.SaveChangesAsync();
 
             if (dto.Amenities != null && dto.Amenities.Any())
             {
@@ -101,8 +104,8 @@ namespace Reservation.Service.Services
                 }
                 await _context.SaveChangesAsync();
             }
-
-            return _mapper.Map<PropertyDto>(property);
+            var createdProperty = await GetPropertyByIdAsync(property.Id);
+            return createdProperty!;
         }
 
 

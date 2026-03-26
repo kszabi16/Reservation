@@ -27,9 +27,14 @@ namespace Reservation.Service.AutoMapper
                 .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<Property, PropertyDto>()
-            .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src =>
-                src.Ratings != null && src.Ratings.Any() ? src.Ratings.Average(r => r.Score) : 0))
-            .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src => src.Images.Select(i => i.ImageUrl).ToList()));
+                .ForMember(dest => dest.AverageRating, opt => opt.MapFrom(src =>
+                    src.Ratings != null && src.Ratings.Any() ? src.Ratings.Average(r => r.Score) : 0))
+                .ForMember(dest => dest.ReviewCount, opt => opt.MapFrom(src =>
+                    src.Ratings != null ? src.Ratings.Count : 0)) 
+                .ForMember(dest => dest.ImageUrls, opt => opt.MapFrom(src =>
+                    src.Images != null ? src.Images.Select(i => i.ImageUrl).ToList() : new List<string>()))
+                .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src =>
+                    src.PropertyAmenities != null ? src.PropertyAmenities.Select(pa => pa.Amenity.Name).ToList() : new List<string>()));
 
             CreateMap<CreatePropertyDto, Property>()
                 .ForMember(dest => dest.Host, opt => opt.Ignore())
@@ -87,10 +92,7 @@ namespace Reservation.Service.AutoMapper
 
             CreateMap<SystemLog, SystemLogDto>();
 
-            CreateMap<Property, PropertyDto>()
-            .ForMember(dest => dest.Amenities, opt => opt.MapFrom(src =>
-                src.PropertyAmenities.Select(pa => pa.Amenity.Name).ToList()
-            ));
+            
         }
 
     }
