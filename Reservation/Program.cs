@@ -13,7 +13,7 @@ namespace Reservation
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -115,7 +115,18 @@ namespace Reservation
 
             var app = builder.Build();
 
-            
+            using (var scope = app.Services.CreateScope())
+            {
+                try
+                {
+                    await DataSeeder.SeedDataAsync(scope.ServiceProvider);
+                    Console.WriteLine("Példa adatok sikeresen ellenõrizve/betöltve!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Hiba az adatok feltöltésekor: {ex.Message}");
+                }
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

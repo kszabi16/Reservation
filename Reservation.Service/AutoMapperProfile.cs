@@ -45,7 +45,8 @@ namespace Reservation.Service.AutoMapper
                 .ForMember(dest => dest.CreatedAt, opt => opt.Ignore())
                 .ForMember(dest => dest.Deleted, opt => opt.Ignore());
 
-            CreateMap<Booking, BookingDto>();
+            CreateMap<Booking, BookingDto>()
+                .ForMember(dest => dest.PropertyTitle, opt => opt.MapFrom(src => src.Property.Title));
             CreateMap<CreateBookingDto, Booking>()
                 .ForMember(dest => dest.Property, opt => opt.Ignore())
                 .ForMember(dest => dest.Guest, opt => opt.Ignore())

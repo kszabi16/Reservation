@@ -6,6 +6,8 @@ namespace Reservation.DataContext.Dtos
     {
         public int Id { get; set; }
         public int PropertyId { get; set; }
+
+        public string PropertyTitle { get; set; }
         public int GuestId { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }

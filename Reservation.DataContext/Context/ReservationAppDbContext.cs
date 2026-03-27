@@ -98,86 +98,8 @@ namespace Reservation.DataContext.Context
                 .WithMany(a => a.PropertyAmenities)
                 .HasForeignKey(pa => pa.AmenityId);
 
-            // Opcionális: Alapértelmezett adatok (Seeding) betöltése, hogy ne legyen üres a szótár
-            modelBuilder.Entity<Amenity>().HasData(
-                new Amenity { Id = 1, Name = "Wifi" },
-                new Amenity { Id = 2, Name = "Klíma" },
-                new Amenity { Id = 3, Name = "Ingyenes parkolás" },
-                new Amenity { Id = 4, Name = "Szauna" },
-                new Amenity { Id = 5, Name = "Állatbarát" }, 
-                new Amenity { Id = 6, Name = "Medence" },
-                new Amenity { Id = 7, Name = "Pezsgőfürdő (Jakuzzi)" },
-                new Amenity { Id = 8, Name = "Erkély / Terasz" },
-                new Amenity { Id = 9, Name = "Felszerelt konyha" },
-                new Amenity { Id = 10, Name = "Mosógép" },
-                new Amenity { Id = 11, Name = "Okostévé (Netflix, stb.)" },
-                new Amenity { Id = 12, Name = "Kert" },
-                new Amenity { Id = 13, Name = "Grillezési lehetőség" },
-                new Amenity { Id = 14, Name = "Reggeli biztosított" },
-                new Amenity { Id = 15, Name = "Elektromos autó töltő" }
-                    );
-
-            modelBuilder.Entity<Property>().HasData(
-                new Property
-                {
-                    Id = 1,
-                    Title = "Budapest belvárosi apartman",
-                    Description = "Modern apartman a Deák tér közelében, remek kilátással.",
-                    Location = "Budapest",
-                    PricePerNight = 25000m,
-                    Capacity = 3,
-                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc), // FIX UTC DÁTUM
-                    HostId = 2,
-                    IsApproved = true
-                },
-                new Property
-                {
-                    Id = 2,
-                    Title = "Balatoni nyaraló",
-                    Description = "Kényelmes ház közvetlenül a Balaton partján.",
-                    Location = "Siófok",
-                    PricePerNight = 45000m,
-                    Capacity = 6,
-                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc), // FIX UTC DÁTUM
-                    HostId = 2,
-                    IsApproved = true
-                },
-                new Property
-                {
-                    Id = 3,
-                    Title = "Hegyi faház Mátrában",
-                    Description = "Hangulatos faház kandallóval és panorámás terasszal.",
-                    Location = "Mátraháza",
-                    PricePerNight = 32000m,
-                    Capacity = 5,
-                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc), // FIX UTC DÁTUM
-                    HostId = 2,
-                    IsApproved = true
-                }
-            );
-
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Username = "Kovács Béla",
-                    Email = "bela@example.com",
-                    PasswordHash = "hashed_pw",
-                    Role = RoleType.Host,
-                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc) // EZ HIÁNYZOTT!
-                },
-                new User
-                {
-                    Id = 2,
-                    Username = "Tóth Anna",
-                    Email = "anna@example.com",
-                    PasswordHash = "hashed_pw",
-                    Role = RoleType.Host,
-                    CreatedAt = new DateTime(2024, 10, 14, 0, 0, 0, DateTimeKind.Utc) // EZ HIÁNYZOTT!
-                }
-            );
-
-
+            modelBuilder.Entity<PropertyAmenity>()
+                .HasQueryFilter(pa => !pa.Property.Deleted);
         }
 
     }

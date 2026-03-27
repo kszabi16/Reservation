@@ -95,6 +95,7 @@ namespace Reservation.Service.Services
         public async Task<IEnumerable<BookingDto>> GetBookingsByGuestIdAsync(int guestId)
         {
             var bookings = await _context.Bookings
+                .Include(b => b.Property)
                 .Where(b => b.GuestId == guestId)
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();
