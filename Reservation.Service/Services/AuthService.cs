@@ -45,7 +45,7 @@ namespace Reservation.Service.Services
                 Username = registerDto.Username,
                 Email = registerDto.Email,
                 PasswordHash = passwordHash,
-                Role = RoleType.Guest // 🔹 Fix: mindig Guest
+                Role = RoleType.Admin // 🔹 Fix: mindig Guest
             };
 
             _context.Users.Add(user);
