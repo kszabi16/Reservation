@@ -3,15 +3,19 @@ using Azure.Search.Documents;
 using Azure.Search.Documents.Models;
 using Microsoft.Extensions.Configuration;
 using Reservation.DataContext.Dtos;
-
+using Reservation.DataContext.Context; // Ehhez kell
+using Microsoft.EntityFrameworkCore; // Ehhez is kell
+using AutoMapper; // És az AutoMapper is
 
 namespace Reservation.Service.Services
 {
     public class SmartSearchService
     {
         private readonly SearchClient _searchClient;
+        private readonly ReservationDbContext _context;
+        private readonly IMapper _mapper;
 
-        public SmartSearchService(IConfiguration configuration)
+        public SmartSearchService(IConfiguration configuration, ReservationDbContext context, IMapper mapper)
         {
             string searchEndpoint = configuration["AzureSearch:Endpoint"];
             string queryApiKey = configuration["AzureSearch:ApiKey"];
@@ -21,22 +25,24 @@ namespace Reservation.Service.Services
                 new Uri(searchEndpoint),
                 indexName,
                 new AzureKeyCredential(queryApiKey));
+
+            _context = context;
+            _mapper = mapper;
         }
 
-        public async Task<List<PropertySearchDto>> SearchAsync(string userQuery)
+        public async Task<List<PropertyDto>> SearchAsync(string userQuery)
         {
-            var results = new List<PropertySearchDto>();
-
             var options = new SearchOptions
             {
-                Select = { "PropertyId", "Title", "Location", "PricePerNight", "AmenitiesList", "MainImageUrl" },
+                Select = { "PropertyId" }, // Már csak az ID-ra van szükségünk az Azure-ből!
                 QueryType = SearchQueryType.Semantic,
                 SemanticSearch = new SemanticSearchOptions
                 {
                     SemanticConfigurationName = "my-semantic-config"
                 },
-                Size = 10 
+                Size = 10
             };
+
             options.VectorSearch = new VectorSearchOptions();
             options.VectorSearch.Queries.Add(new VectorizableTextQuery(text: userQuery)
             {
@@ -44,24 +50,52 @@ namespace Reservation.Service.Services
                 Fields = { "DescriptionVector" }
             });
 
+            // 1. Megkeressük az Azure-ban a legjobb ID-kat és a pontszámukat
             SearchResults<SearchDocument> response = await _searchClient.SearchAsync<SearchDocument>(userQuery, options);
+
+            var propertyScores = new Dictionary<int, double?>();
 
             await foreach (SearchResult<SearchDocument> result in response.GetResultsAsync())
             {
                 var doc = result.Document;
-                results.Add(new PropertySearchDto
+                if (doc.TryGetValue("PropertyId", out var idObj) && idObj != null)
                 {
-                    PropertyId = doc["PropertyId"]?.ToString(),
-                    Title = doc["Title"]?.ToString(),
-                    Location = doc["Location"]?.ToString(),
-                    PricePerNight = Convert.ToDecimal(doc["PricePerNight"]),
-                    AmenitiesList = doc["AmenitiesList"]?.ToString(),
-                    MainImageUrl = doc["MainImageUrl"]?.ToString(),
-                    RelevancyScore = result.SemanticSearch.RerankerScore
-                });
+                    int propId = Convert.ToInt32(idObj.ToString());
+                    propertyScores[propId] = result.SemanticSearch.RerankerScore;
+                }
             }
 
-            return results;
+            var matchingIds = propertyScores.Keys.ToList();
+
+            if (!matchingIds.Any())
+            {
+                return new List<PropertyDto>(); // Ha nincs találat, üres listát adunk
+            }
+
+            // 2. Lekérjük a SQL Adatbázisból a TELJES, gazdag adatlapokat képekkel és felszereltséggel!
+            var propertiesFromDb = await _context.Properties
+                .Where(p => matchingIds.Contains(p.Id) && p.IsApproved)
+                .Include(p => p.Ratings)
+                .Include(p => p.Images)
+                .Include(p => p.PropertyAmenities)
+                    .ThenInclude(pa => pa.Amenity)
+                .AsSplitQuery()
+                .ToListAsync();
+
+            // 3. DTO-ba alakítjuk az AutoMapperrel
+            var dtos = _mapper.Map<List<PropertyDto>>(propertiesFromDb);
+
+            // 4. Hozzárendeljük az AI pontszámokat és sorbarendezzük
+            foreach (var dto in dtos)
+            {
+                if (propertyScores.TryGetValue(dto.Id, out var score))
+                {
+                    dto.RelevancyScore = score;
+                }
+            }
+
+            // A legjobban egyező (legmagasabb pontszámú) legyen elöl
+            return dtos.OrderByDescending(d => d.RelevancyScore).ToList();
         }
     }
 }

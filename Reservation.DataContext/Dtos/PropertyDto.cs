@@ -19,6 +19,7 @@ namespace Reservation.DataContext.Dtos
         public bool IsApproved { get; set; }
 
         public List<string> Amenities { get; set; } = new List<string>();
+        public double? RelevancyScore { get; set; }
     }
 
     public class CreatePropertyDto

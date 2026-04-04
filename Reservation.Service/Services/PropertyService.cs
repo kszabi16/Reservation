@@ -24,7 +24,9 @@ namespace Reservation.Service.Services
                 .Include(p=>p.Ratings)
                 .Where(p => p.IsApproved)
                 .Include(p => p.PropertyAmenities)
-                .Include(p => p.Images)
+                .ThenInclude(pa => pa.Amenity)
+                    .Include(p => p.Images)
+                    .AsSplitQuery()
                 .ToListAsync();
 
             return _mapper.Map<IEnumerable<PropertyDto>>(properties);
