@@ -63,12 +63,19 @@ namespace Reservation
                 });
             });
 
-            
             builder.Services.AddDbContext<ReservationDbContext>(options =>
-                options.UseSqlServer(
-                    builder.Configuration.GetConnectionString("ReservationContext"),
-                    b => b.MigrationsAssembly("Reservation")
-                ));
+        options.UseSqlServer(
+            builder.Configuration.GetConnectionString("ReservationContext"),
+            b =>
+            {
+            b.MigrationsAssembly("Reservation"); 
+
+            b.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(30),
+                    errorNumbersToAdd: null);
+                }
+            ));
 
 
             builder.Services.AddCors(options =>
@@ -93,6 +100,7 @@ namespace Reservation
             builder.Services.AddScoped<IHostRequestService, HostRequestService>();
             builder.Services.AddScoped<IRatingService, RatingService>();
             builder.Services.AddScoped<ImageUploadService>();
+            builder.Services.AddScoped<SmartSearchService>();
 
             builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
