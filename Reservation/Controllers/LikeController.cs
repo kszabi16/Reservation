@@ -64,42 +64,6 @@ namespace Reservation.Controllers
 
        
         [Authorize(Roles = "Guest,Host,Admin")]
-        [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetLikesByUser(int userId)
-        {
-            var likes = await _likeService.GetLikesByUserIdAsync(userId);
-            return Ok(likes);
-        }
-
-      
-        [AllowAnonymous]
-        [HttpGet("property/{propertyId}")]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetLikesByProperty(int propertyId)
-        {
-            var likes = await _likeService.GetLikesByPropertyIdAsync(propertyId);
-            return Ok(likes);
-        }
-
-       
-        [AllowAnonymous]
-        [HttpGet("comment/{commentId}")]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetLikesByComment(int commentId)
-        {
-            var likes = await _likeService.GetLikesByCommentIdAsync(commentId);
-            return Ok(likes);
-        }
-
-      
-        [Authorize(Roles = "Admin")]
-        [HttpGet("target-type/{targetType}")]
-        public async Task<ActionResult<IEnumerable<LikeDto>>> GetLikesByTargetType(LikeTargetType targetType)
-        {
-            var likes = await _likeService.GetLikesByTargetTypeAsync(targetType);
-            return Ok(likes);
-        }
-
-       
-        [Authorize(Roles = "Guest,Host,Admin")]
         [HttpGet("is-liked")]
         public async Task<ActionResult<bool>> IsLiked(
             [FromQuery] int userId,

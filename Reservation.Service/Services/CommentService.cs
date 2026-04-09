@@ -18,12 +18,6 @@ namespace Reservation.Service.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<CommentDto>> GetAllCommentsAsync()
-        {
-            var comments = await _context.Comments.ToListAsync();
-            return _mapper.Map<IEnumerable<CommentDto>>(comments);
-        }
-
         public async Task<CommentDto?> GetCommentByIdAsync(int id)
         {
             var comment = await _context.Comments.FindAsync(id);
@@ -39,13 +33,11 @@ namespace Reservation.Service.Services
             if (string.IsNullOrWhiteSpace(createCommentDto.Content))
                 throw new InvalidOperationException("Comment content cannot be empty.");
 
-            // 1. Komment létrehozása
             var comment = _mapper.Map<Comment>(createCommentDto);
             comment.UserId = userId;
             comment.CreatedAt = DateTime.UtcNow;
             _context.Comments.Add(comment);
 
-            // 2. ÚJ LOGIKA: Ha a felhasználó csillagot is adott, elmentjük a Rating táblába!
             if (createCommentDto.Rating > 0)
             {
                 var rating = new Rating
@@ -63,21 +55,6 @@ namespace Reservation.Service.Services
             return _mapper.Map<CommentDto>(comment);
         }
 
-
-        public async Task<CommentDto?> UpdateCommentAsync(int id, CreateCommentDto updateCommentDto)
-        {
-            var comment = await _context.Comments.FindAsync(id);
-            if (comment == null)
-                return null;
-
-            if (string.IsNullOrWhiteSpace(updateCommentDto.Content))
-                throw new InvalidOperationException("Comment content cannot be empty.");
-
-            _mapper.Map(updateCommentDto, comment);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<CommentDto>(comment);
-        }
 
         public async Task<bool> DeleteCommentAsync(int id)
         {
@@ -100,30 +77,5 @@ namespace Reservation.Service.Services
             return _mapper.Map<IEnumerable<CommentDto>>(comments);
         }
 
-        public async Task<IEnumerable<CommentDto>> GetCommentsByUserIdAsync(int userId)
-        {
-            var comments = await _context.Comments
-                .Where(c => c.UserId == userId)
-                .OrderByDescending(c => c.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<CommentDto>>(comments);
-        }
-
-        public async Task<IEnumerable<CommentDto>> GetCommentRepliesAsync(int CommentId)
-        {
-            var replies = await _context.Comments
-                .OrderBy(c => c.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<CommentDto>>(replies);
-        }
-
-        public async Task<IEnumerable<CommentDto>> GetTopLevelCommentsAsync(int propertyId)
-        {
-            var topLevelComments = await _context.Comments
-                .Where(c => c.PropertyId == propertyId )
-                .OrderBy(c => c.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<CommentDto>>(topLevelComments);
-        }
     }
 }

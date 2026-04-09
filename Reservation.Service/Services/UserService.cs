@@ -40,7 +40,6 @@ namespace Reservation.Service.Services
             if (await UsernameExistsAsync(createUserDto.Username))
                 throw new InvalidOperationException("Username already exists.");
 
-            // Jelszó hash-elés
             createUserDto.Password = BCrypt.Net.BCrypt.HashPassword(createUserDto.Password);
 
             var user = _mapper.Map<User>(createUserDto);
@@ -56,7 +55,6 @@ namespace Reservation.Service.Services
             if (user == null)
                 return null;
 
-            // Ellenőrizzük, hogy az email/username már létezik-e másik felhasználónál
             if (user.Email != updateUserDto.Email && await EmailExistsAsync(updateUserDto.Email))
                 throw new InvalidOperationException("Email already exists.");
 
@@ -80,17 +78,6 @@ namespace Reservation.Service.Services
             return true;
         }
 
-        public async Task<UserDto?> GetUserByEmailAsync(string email)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
-            return user == null ? null : _mapper.Map<UserDto>(user);
-        }
-
-        public async Task<UserDto?> GetUserByUsernameAsync(string username)
-        {
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Username == username);
-            return user == null ? null : _mapper.Map<UserDto>(user);
-        }
 
         public async Task<bool> EmailExistsAsync(string email)
         {
@@ -100,15 +87,6 @@ namespace Reservation.Service.Services
         public async Task<bool> UsernameExistsAsync(string username)
         {
             return await _context.Users.AnyAsync(u => u.Username == username);
-        }
-        public async Task SetTrustedStatusAsync(int userId, bool isTrusted)
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-                throw new InvalidOperationException("User not found.");
-
-            user.IsTrustedHost = isTrusted;
-            await _context.SaveChangesAsync();
         }
 
         public async Task<UserDto?> UpdateUserProfileAsync(int id, UpdateUserProfileDto profileDto)
@@ -135,8 +113,6 @@ namespace Reservation.Service.Services
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null) return false;
-
-            // Megfordítjuk a jelenlegi állapotot (ha false volt, true lesz, és fordítva)
             user.IsTrustedHost = !user.IsTrustedHost;
             await _context.SaveChangesAsync();
 

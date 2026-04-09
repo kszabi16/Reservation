@@ -81,17 +81,6 @@ namespace Reservation.Service.Services
             return _mapper.Map<BookingDto>(booking);
         }
 
-        public async Task<bool> DeleteBookingAsync(int id)
-        {
-            var booking = await _context.Bookings.FindAsync(id);
-            if (booking == null)
-                return false;
-
-            booking.Deleted = true;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
         public async Task<IEnumerable<BookingDto>> GetBookingsByGuestIdAsync(int guestId)
         {
             var bookings = await _context.Bookings
@@ -111,23 +100,6 @@ namespace Reservation.Service.Services
             return _mapper.Map<IEnumerable<BookingDto>>(bookings);
         }
 
-        public async Task<IEnumerable<BookingDto>> GetBookingsByStatusAsync(BookingStatus status)
-        {
-            var bookings = await _context.Bookings
-                .Where(b => b.Status == status)
-                .OrderByDescending(b => b.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<BookingDto>>(bookings);
-        }
-
-        public async Task<IEnumerable<BookingDto>> GetBookingsByDateRangeAsync(DateTime startDate, DateTime endDate)
-        {
-            var bookings = await _context.Bookings
-                .Where(b => b.StartDate >= startDate && b.EndDate <= endDate)
-                .OrderBy(b => b.StartDate)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<BookingDto>>(bookings);
-        }
 
         public async Task<bool> UpdateBookingStatusAsync(int id, BookingStatus status)
         {

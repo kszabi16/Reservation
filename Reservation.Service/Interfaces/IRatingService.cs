@@ -8,6 +8,5 @@ namespace Reservation.Service.Interfaces
     {
         Task<RatingDto> AddOrUpdateRatingAsync(int userId, CreateRatingDto dto);
         Task<double> GetAverageRatingForPropertyAsync(int propertyId);
-        Task<IEnumerable<RatingDto>> GetRatingsForPropertyAsync(int propertyId);
     }
 }

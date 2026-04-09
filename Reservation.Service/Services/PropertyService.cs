@@ -143,14 +143,6 @@ namespace Reservation.Service.Services
             return _mapper.Map<IEnumerable<PropertyDto>>(properties);
         }
 
-        public async Task<IEnumerable<PropertyDto>> GetPropertiesByLocationAsync(string location)
-        {
-            var properties = await _context.Properties
-                .Where(p => p.Location.Contains(location))
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<PropertyDto>>(properties);
-        }
-
         public async Task<IEnumerable<PropertyDto>> GetPropertiesByPriceRangeAsync(decimal minPrice, decimal maxPrice)
         {
             var properties = await _context.Properties

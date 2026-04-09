@@ -6,8 +6,5 @@ namespace Reservation.Service.Interfaces
     {
         Task<AuthResponseDto> RegisterAsync(RegisterDto registerDto);
         Task<AuthResponseDto> LoginAsync(LoginDto loginDto);
-        Task<bool> ChangePasswordAsync(int userId, ChangePasswordDto changePasswordDto);
-        Task<bool> ValidateTokenAsync(string token);
-        Task<AuthResponseDto> RefreshTokenAsync(string token);
     }
 }

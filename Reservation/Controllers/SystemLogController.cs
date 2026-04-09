@@ -24,7 +24,6 @@ namespace Reservation.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<SystemLogDto>>> GetLogs()
         {
-            // A legújabb 100 bejegyzést kérjük le, hogy ne terheljük a hálózatot
             var logs = await _context.SystemLogs
                 .OrderByDescending(l => l.CreatedAt)
                 .Take(100)

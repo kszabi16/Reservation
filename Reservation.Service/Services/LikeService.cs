@@ -35,8 +35,6 @@ namespace Reservation.Service.Services
             var user = await _context.Users.FindAsync(createLikeDto.UserId);
             if (user == null)
                 throw new InvalidOperationException("User not found.");
-
-            // Ellenőrizzük a target entitást
             if (createLikeDto.TargetType == LikeTargetType.Property)
             {
                 if (!createLikeDto.PropertyId.HasValue)
@@ -56,7 +54,6 @@ namespace Reservation.Service.Services
                     throw new InvalidOperationException("Comment not found.");
             }
 
-            // Ellenőrizzük, hogy már nincs-e like
             if (await IsLikedAsync(createLikeDto.UserId, createLikeDto.TargetType, createLikeDto.PropertyId, createLikeDto.CommentId))
                 throw new InvalidOperationException("Already liked.");
 
@@ -76,42 +73,6 @@ namespace Reservation.Service.Services
             like.Deleted = true;
             await _context.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<IEnumerable<LikeDto>> GetLikesByUserIdAsync(int userId)
-        {
-            var likes = await _context.Likes
-                .Where(l => l.UserId == userId)
-                .OrderByDescending(l => l.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<LikeDto>>(likes);
-        }
-
-        public async Task<IEnumerable<LikeDto>> GetLikesByPropertyIdAsync(int propertyId)
-        {
-            var likes = await _context.Likes
-                .Where(l => l.TargetType == LikeTargetType.Property && l.PropertyId == propertyId)
-                .OrderByDescending(l => l.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<LikeDto>>(likes);
-        }
-
-        public async Task<IEnumerable<LikeDto>> GetLikesByCommentIdAsync(int commentId)
-        {
-            var likes = await _context.Likes
-                .Where(l => l.TargetType == LikeTargetType.Comment && l.CommentId == commentId)
-                .OrderByDescending(l => l.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<LikeDto>>(likes);
-        }
-
-        public async Task<IEnumerable<LikeDto>> GetLikesByTargetTypeAsync(LikeTargetType targetType)
-        {
-            var likes = await _context.Likes
-                .Where(l => l.TargetType == targetType)
-                .OrderByDescending(l => l.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<LikeDto>>(likes);
         }
 
         public async Task<bool> IsLikedAsync(int userId, LikeTargetType targetType, int? propertyId = null, int? commentId = null)
@@ -151,7 +112,6 @@ namespace Reservation.Service.Services
             if (user == null)
                 throw new InvalidOperationException("User not found.");
 
-            // Ellenőrizzük a target entitást
             if (targetType == LikeTargetType.Property && propertyId.HasValue)
             {
                 var property = await _context.Properties.FindAsync(propertyId.Value);
@@ -171,14 +131,12 @@ namespace Reservation.Service.Services
 
             if (existingLike != null)
             {
-                // Ha már like, akkor eltávolítjuk
                 existingLike.Deleted = true;
                 await _context.SaveChangesAsync();
-                return false; // Nem like többé
+                return false;
             }
             else
             {
-                // Ha nem like, akkor hozzáadjuk
                 var like = new Like
                 {
                     UserId = userId,
@@ -188,7 +146,7 @@ namespace Reservation.Service.Services
                 };
                 _context.Likes.Add(like);
                 await _context.SaveChangesAsync();
-                return true; // Like lett
+                return true;
             }
         }
     }

@@ -82,7 +82,6 @@ namespace Reservation.Controllers
             }
             catch (InvalidOperationException ex)
             {
-                // Ha foglalt az email vagy a név, ezt a konkrét hibaüzenetet küldjük vissza!
                 return BadRequest(new { message = ex.Message });
             }
         }
@@ -112,17 +111,6 @@ namespace Reservation.Controllers
             var result = await _userService.DeleteUserAsync(id);
             if (!result) return NotFound($"User with ID {id} not found.");
             return NoContent();
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpPut("{id}/trust")]
-        public async Task<ActionResult> SetTrustedHost(int id, [FromQuery] bool isTrusted)
-        {
-            var user = await _userService.GetUserByIdAsync(id);
-            if (user == null) return NotFound($"User with ID {id} not found.");
-
-            await _userService.SetTrustedStatusAsync(id, isTrusted);
-            return Ok(new { message = $"User {(isTrusted ? "marked as trusted" : "untrusted")} host." });
         }
 
         private int GetCurrentUserId()

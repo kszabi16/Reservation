@@ -135,8 +135,6 @@ namespace Reservation
                     Console.WriteLine($"Hiba az adatok feltöltésekor: {ex.Message}");
                 }
             }
-
-            // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();

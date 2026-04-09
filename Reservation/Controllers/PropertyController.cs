@@ -97,15 +97,7 @@ namespace Reservation.Controllers
             return Ok(properties);
         }
 
-        
-        [AllowAnonymous]
-        [HttpGet("location/{location}")]
-        public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPropertiesByLocation(string location)
-        {
-            var properties = await _propertyService.GetPropertiesByLocationAsync(location);
-            return Ok(properties);
-        }
-
+ 
         [AllowAnonymous]
         [HttpGet("price-range")]
         public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPropertiesByPriceRange(
@@ -116,7 +108,6 @@ namespace Reservation.Controllers
             return Ok(properties);
         }
 
-        
         [AllowAnonymous]
         [HttpGet("capacity/{minCapacity}")]
         public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPropertiesByCapacity(int minCapacity)
@@ -134,7 +125,7 @@ namespace Reservation.Controllers
         }
 
         [HttpPost("{propertyId}/upload-images")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> UploadImages(int propertyId, IEnumerable<IFormFile> files, [FromServices] ImageUploadService uploadService)
         {
             try
@@ -143,15 +134,11 @@ namespace Reservation.Controllers
                     return BadRequest("Nem érkezett fájl.");
 
                 var imageUrls = new List<string>();
-
-                // Ciklusban feltöltjük az összes képet az ImgBB-re
                 foreach (var file in files)
                 {
                     var url = await uploadService.UploadImageAsync(file);
                     imageUrls.Add(url);
                 }
-
-                // Elmentjük az összes URL-t az adatbázisba az új metódussal
                 var success = await _propertyService.AddPropertyImagesAsync(propertyId, imageUrls);
 
                 if (!success) return NotFound("Ingatlan nem található.");

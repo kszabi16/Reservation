@@ -18,7 +18,6 @@ namespace Reservation.Service.Services
             _mapper = mapper;
         }
 
-        // Admin: összes HostRequest
         public async Task<IEnumerable<HostRequestDto>> GetAllAsync()
         {
             var requests = await _context.HostRequests
@@ -29,7 +28,6 @@ namespace Reservation.Service.Services
             return _mapper.Map<IEnumerable<HostRequestDto>>(requests);
         }
 
-        // Admin: függőben lévők
         public async Task<IEnumerable<HostRequestDto>> GetPendingAsync()
         {
             var pending = await _context.HostRequests
@@ -41,18 +39,6 @@ namespace Reservation.Service.Services
             return _mapper.Map<IEnumerable<HostRequestDto>>(pending);
         }
 
-        // Egy adott request lekérdezése
-        public async Task<HostRequestDto?> GetByIdAsync(int id)
-        {
-            var request = await _context.HostRequests
-                .Include(r => r.User)
-                .Include(r => r.Property)
-                .FirstOrDefaultAsync(r => r.Id == id);
-
-            return request == null ? null : _mapper.Map<HostRequestDto>(request);
-        }
-
-        //  Új HostRequest létrehozása (Guest indítja automatikusan)
         public async Task<HostRequestDto> CreateAsync(CreateHostRequestDto dto)
         {
             var user = await _context.Users.FindAsync(dto.UserId);
@@ -67,7 +53,6 @@ namespace Reservation.Service.Services
             _context.HostRequests.Add(newRequest);
             await _context.SaveChangesAsync();
 
-            // újra betöltjük a kapcsolt adatokat a DTO-hoz
             var loaded = await _context.HostRequests
                 .Include(r => r.User)
                 .Include(r => r.Property)
@@ -76,7 +61,6 @@ namespace Reservation.Service.Services
             return _mapper.Map<HostRequestDto>(loaded);
         }
 
-        // Admin jóváhagyás
         public async Task<bool> ApproveAsync(int id)
         {
             var request = await _context.HostRequests
@@ -95,9 +79,7 @@ namespace Reservation.Service.Services
             await _context.SaveChangesAsync();
             return true;
         }
-
-        // Admin elutasítás
-        public async Task<bool> RejectAsync(int id)
+     public async Task<bool> RejectAsync(int id)
         {
             var request = await _context.HostRequests.FirstOrDefaultAsync(r => r.Id == id);
             if (request == null)

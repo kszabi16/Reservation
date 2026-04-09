@@ -48,22 +48,5 @@ namespace Reservation.Controllers
             return deleted ? NoContent() : Forbid("You are not authorized to delete this comment.");
         }
 
-        [Authorize(Roles = "Host,Admin")]
-        [HttpGet("user/{userId}")]
-        public async Task<ActionResult<IEnumerable<CommentDto>>> GetCommentsByUser(int userId)
-        {
-            var comments = await _commentService.GetCommentsByUserIdAsync(userId);
-
-            return Ok(comments);
-        }
-
-       
-        [HttpGet("property/{propertyId}/top-level")]
-        public async Task<ActionResult<IEnumerable<CommentDto>>> GetTopLevelComments(int propertyId)
-        {
-            var comments = await _commentService.GetTopLevelCommentsAsync(propertyId);
-
-            return Ok(comments);
-        }
     }
 }

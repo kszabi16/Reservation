@@ -29,7 +29,6 @@ namespace Reservation.DataContext.Context
         {
             base.OnModelCreating(modelBuilder);
 
-            // Globális soft delete filter
             modelBuilder.Entity<User>().HasQueryFilter(e => !e.Deleted);
             modelBuilder.Entity<Property>().HasQueryFilter(e => !e.Deleted);
             modelBuilder.Entity<Booking>().HasQueryFilter(e => !e.Deleted);
@@ -38,42 +37,34 @@ namespace Reservation.DataContext.Context
             modelBuilder.Entity<Like>().HasQueryFilter(e => !e.Deleted);
             modelBuilder.Entity<PropertyImage>().HasQueryFilter(e => !e.Deleted);
 
-        // Foreign Key konfiguráció cascade delete konfliktusok elkerülésére
-
-        // Booking -> Guest kapcsolat (NoAction a cascade konfliktus elkerülésére)
         modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Guest)
                 .WithMany(u => u.Bookings)
                 .HasForeignKey(b => b.GuestId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // Booking -> Property kapcsolat (Cascade megtartva)
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Property)
                 .WithMany(p => p.Bookings)
                 .HasForeignKey(b => b.PropertyId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Property -> Host kapcsolat (NoAction a cascade konfliktus elkerülésére)
             modelBuilder.Entity<Property>()
                 .HasOne(p => p.Host)
                 .WithMany(u => u.Properties)
                 .HasForeignKey(p => p.HostId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // Decimal precision beállítása a PricePerNight mezőhöz
             modelBuilder.Entity<Property>()
                 .Property(p => p.PricePerNight)
                 .HasPrecision(18, 2);
 
-            // HostRequest -> Property kapcsolat
             modelBuilder.Entity<HostRequest>()
                 .HasOne(r => r.Property)
                 .WithMany()
                 .HasForeignKey(r => r.PropertyId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // HostRequest -> User kapcsolat
             modelBuilder.Entity<HostRequest>()
                 .HasOne(r => r.User)
                 .WithMany()
@@ -86,13 +77,11 @@ namespace Reservation.DataContext.Context
             modelBuilder.Entity<PropertyAmenity>()
             .HasKey(pa => new { pa.PropertyId, pa.AmenityId });
 
-            // 2. Kapcsolat az Ingatlan (Property) felé
             modelBuilder.Entity<PropertyAmenity>()
                 .HasOne(pa => pa.Property)
                 .WithMany(p => p.PropertyAmenities)
                 .HasForeignKey(pa => pa.PropertyId);
 
-            // 3. Kapcsolat a Felszereltség (Amenity) felé
             modelBuilder.Entity<PropertyAmenity>()
                 .HasOne(pa => pa.Amenity)
                 .WithMany(a => a.PropertyAmenities)

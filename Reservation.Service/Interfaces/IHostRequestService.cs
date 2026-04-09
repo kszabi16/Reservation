@@ -6,7 +6,6 @@ namespace Reservation.Service.Interfaces
     {
         Task<IEnumerable<HostRequestDto>> GetAllAsync();
         Task<IEnumerable<HostRequestDto>> GetPendingAsync();
-        Task<HostRequestDto?> GetByIdAsync(int id);
         Task<HostRequestDto> CreateAsync(CreateHostRequestDto dto);
         Task<bool> ApproveAsync(int id);
         Task<bool> RejectAsync(int id);

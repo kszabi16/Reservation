@@ -34,7 +34,7 @@ namespace Reservation.Service.Services
         {
             var options = new SearchOptions
             {
-                Select = { "PropertyId" }, // Már csak az ID-ra van szükségünk az Azure-ből!
+                Select = { "PropertyId" },
                 QueryType = SearchQueryType.Semantic,
                 SemanticSearch = new SemanticSearchOptions
                 {
@@ -50,7 +50,6 @@ namespace Reservation.Service.Services
                 Fields = { "DescriptionVector" }
             });
 
-            // 1. Megkeressük az Azure-ban a legjobb ID-kat és a pontszámukat
             SearchResults<SearchDocument> response = await _searchClient.SearchAsync<SearchDocument>(userQuery, options);
 
             var propertyScores = new Dictionary<int, double?>();
@@ -69,10 +68,9 @@ namespace Reservation.Service.Services
 
             if (!matchingIds.Any())
             {
-                return new List<PropertyDto>(); // Ha nincs találat, üres listát adunk
+                return new List<PropertyDto>(); 
             }
 
-            // 2. Lekérjük a SQL Adatbázisból a TELJES, gazdag adatlapokat képekkel és felszereltséggel!
             var propertiesFromDb = await _context.Properties
                 .Where(p => matchingIds.Contains(p.Id) && p.IsApproved)
                 .Include(p => p.Ratings)
@@ -82,10 +80,8 @@ namespace Reservation.Service.Services
                 .AsSplitQuery()
                 .ToListAsync();
 
-            // 3. DTO-ba alakítjuk az AutoMapperrel
             var dtos = _mapper.Map<List<PropertyDto>>(propertiesFromDb);
 
-            // 4. Hozzárendeljük az AI pontszámokat és sorbarendezzük
             foreach (var dto in dtos)
             {
                 if (propertyScores.TryGetValue(dto.Id, out var score))
@@ -93,8 +89,6 @@ namespace Reservation.Service.Services
                     dto.RelevancyScore = score;
                 }
             }
-
-            // A legjobban egyező (legmagasabb pontszámú) legyen elöl
             return dtos.OrderByDescending(d => d.RelevancyScore).ToList();
         }
     }

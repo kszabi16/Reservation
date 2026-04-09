@@ -19,7 +19,6 @@ namespace Reservation.Controllers
             _ratingService = ratingService;
         }
 
-        // Értékelés leadása (Csak bejelentkezett felhasználóknak)
         [Authorize]
         [HttpPost]
         public async Task<ActionResult<RatingDto>> RateProperty([FromBody] CreateRatingDto dto)
@@ -36,7 +35,6 @@ namespace Reservation.Controllers
             }
         }
 
-        // Egy ingatlan átlagos értékelésének lekérése (Bárki láthatja)
         [AllowAnonymous]
         [HttpGet("property/{propertyId}/average")]
         public async Task<ActionResult<double>> GetAverageRating(int propertyId)

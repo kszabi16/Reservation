@@ -29,19 +29,16 @@ namespace Reservation.Service.Services
 			var propertyExists = await _context.Properties.AnyAsync(p => p.Id == dto.PropertyId);
 			if (!propertyExists) throw new InvalidOperationException("Property not found.");
 
-			// Ellenõrizzük, hogy ez a user értékelt-e már
 			var existingRating = await _context.Ratings
 				.FirstOrDefaultAsync(r => r.UserId == userId && r.PropertyId == dto.PropertyId);
 
 			if (existingRating != null)
 			{
-				// Ha már értékelt, csak frissítjük a pontszámot
 				existingRating.Score = dto.Score;
 				await _context.SaveChangesAsync();
 				return _mapper.Map<RatingDto>(existingRating);
 			}
 
-			// Új értékelés létrehozása
 			var newRating = _mapper.Map<Rating>(dto);
 			newRating.UserId = userId;
 			_context.Ratings.Add(newRating);
@@ -55,13 +52,8 @@ namespace Reservation.Service.Services
 			var ratings = await _context.Ratings.Where(r => r.PropertyId == propertyId).ToListAsync();
 			if (!ratings.Any()) return 0;
 
-			return Math.Round(ratings.Average(r => r.Score), 1); // 1 tizedesjegyre kerekítve (pl. 4.8)
+			return Math.Round(ratings.Average(r => r.Score), 1);
 		}
 
-		public async Task<IEnumerable<RatingDto>> GetRatingsForPropertyAsync(int propertyId)
-		{
-			var ratings = await _context.Ratings.Where(r => r.PropertyId == propertyId).ToListAsync();
-			return _mapper.Map<IEnumerable<RatingDto>>(ratings);
-		}
 	}
 }

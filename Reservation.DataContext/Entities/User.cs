@@ -14,8 +14,6 @@
         public string PasswordHash { get; set; } = null!;
         public RoleType Role { get; set; }
         public bool IsTrustedHost { get; set; } = false;
-
-        // --- ÚJ MEZŐK A PROFILHOZ 
         public string? PhoneNumber { get; set; } 
         public string? Location { get; set; }    
         public string? Bio { get; set; }       

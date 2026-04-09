@@ -364,5 +364,5 @@ FodyWeavers.xsd
 
 Reservation/credentials.json
 
-appsettings.json
-appsettings.Development.json
+Reservation/appsettings.json
+Reservation/appsettings.Development.json

@@ -14,7 +14,6 @@ namespace Reservation
 
             await context.Database.MigrateAsync();
 
-            // Ha már van legalább 10 ingatlan, nem csinálunk semmit
             if (await context.Properties.CountAsync() >= 10)
                 return;
 
@@ -25,7 +24,7 @@ namespace Reservation
                 {
                     Username = "Példa Host",
                     Email = "host@pelda.hu",
-                    PasswordHash = "TitkosJelszo123!", // Csak teszt célra
+                    PasswordHash = "TitkosJelszo123!",
                     Role = RoleType.Host,
                     IsTrustedHost = true,
                     CreatedAt = DateTime.UtcNow
@@ -34,7 +33,6 @@ namespace Reservation
                 await context.SaveChangesAsync();
             }
 
-            //Felszereltségek
             var defaultAmenities = new[]
              {
                 "Wifi", "Klíma", "Szauna", "Medence", "Ingyenes parkolás",
@@ -54,7 +52,6 @@ namespace Reservation
             await context.SaveChangesAsync();
             var allAmenities = await context.Amenities.ToListAsync();
 
-            //Ingatlan generátor szótárak
             var adjectives = new[]
             {
                 "Panorámás", "Modern", "Luxus", "Hangulatos", "Romantikus",

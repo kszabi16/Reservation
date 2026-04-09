@@ -89,29 +89,7 @@ namespace Reservation.Controllers
             var bookings = await _bookingService.GetBookingsByPropertyIdAsync(propertyId);
             return Ok(bookings);
         }
-        
 
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet("status/{status}")]
-        public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByStatus(BookingStatus status)
-        {
-            var bookings = await _bookingService.GetBookingsByStatusAsync(status);
-            return Ok(bookings);
-        }
-
-        
-        [Authorize(Roles = "Admin")]
-        [HttpGet("date-range")]
-        public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByDateRange(
-            [FromQuery] DateTime startDate,
-            [FromQuery] DateTime endDate)
-        {
-            var bookings = await _bookingService.GetBookingsByDateRangeAsync(startDate, endDate);
-            return Ok(bookings);
-        }
-
-       
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/status")]
         public async Task<ActionResult> UpdateBookingStatus(int id, [FromBody] BookingStatus status)
@@ -126,7 +104,6 @@ namespace Reservation.Controllers
         [HttpGet("pending-requests")]
         public async Task<ActionResult<IEnumerable<BookingDto>>> GetPendingRequests()
         {
-            // Kiolvassuk a bejelentkezett Host ID-ját a Claims-bõl
             var hostId = int.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value ?? "0");
 
             if (hostId == 0) return Unauthorized();
