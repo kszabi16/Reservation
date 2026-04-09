@@ -18,86 +18,18 @@ namespace Reservation.Service.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<LikeDto>> GetAllLikesAsync()
+        public async Task<IEnumerable<LikeDto>> GetLikesByUserIdAsync(int userId)
         {
-            var likes = await _context.Likes.ToListAsync();
+            var likes = await _context.Likes
+                .Where(l => l.UserId == userId)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
             return _mapper.Map<IEnumerable<LikeDto>>(likes);
-        }
-
-        public async Task<LikeDto?> GetLikeByIdAsync(int id)
-        {
-            var like = await _context.Likes.FindAsync(id);
-            return like == null ? null : _mapper.Map<LikeDto>(like);
-        }
-
-        public async Task<LikeDto> CreateLikeAsync(CreateLikeDto createLikeDto)
-        {
-            var user = await _context.Users.FindAsync(createLikeDto.UserId);
-            if (user == null)
-                throw new InvalidOperationException("User not found.");
-            if (createLikeDto.TargetType == LikeTargetType.Property)
-            {
-                if (!createLikeDto.PropertyId.HasValue)
-                    throw new InvalidOperationException("PropertyId is required for Property likes.");
-                
-                var property = await _context.Properties.FindAsync(createLikeDto.PropertyId.Value);
-                if (property == null)
-                    throw new InvalidOperationException("Property not found.");
-            }
-            else if (createLikeDto.TargetType == LikeTargetType.Comment)
-            {
-                if (!createLikeDto.CommentId.HasValue)
-                    throw new InvalidOperationException("CommentId is required for Comment likes.");
-                
-                var comment = await _context.Comments.FindAsync(createLikeDto.CommentId.Value);
-                if (comment == null)
-                    throw new InvalidOperationException("Comment not found.");
-            }
-
-            if (await IsLikedAsync(createLikeDto.UserId, createLikeDto.TargetType, createLikeDto.PropertyId, createLikeDto.CommentId))
-                throw new InvalidOperationException("Already liked.");
-
-            var like = _mapper.Map<Like>(createLikeDto);
-            _context.Likes.Add(like);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<LikeDto>(like);
         }
 
         public async Task<bool> DeleteLikeAsync(int id)
         {
             var like = await _context.Likes.FindAsync(id);
-            if (like == null)
-                return false;
-
-            like.Deleted = true;
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-        public async Task<bool> IsLikedAsync(int userId, LikeTargetType targetType, int? propertyId = null, int? commentId = null)
-        {
-            var query = _context.Likes.Where(l => l.UserId == userId && l.TargetType == targetType);
-            
-            if (targetType == LikeTargetType.Property && propertyId.HasValue)
-                query = query.Where(l => l.PropertyId == propertyId);
-            else if (targetType == LikeTargetType.Comment && commentId.HasValue)
-                query = query.Where(l => l.CommentId == commentId);
-
-            return await query.AnyAsync();
-        }
-
-        public async Task<bool> RemoveLikeAsync(int userId, LikeTargetType targetType, int? propertyId = null, int? commentId = null)
-        {
-            var query = _context.Likes.Where(l => l.UserId == userId && l.TargetType == targetType);
-            
-            if (targetType == LikeTargetType.Property && propertyId.HasValue)
-                query = query.Where(l => l.PropertyId == propertyId);
-            else if (targetType == LikeTargetType.Comment && commentId.HasValue)
-                query = query.Where(l => l.CommentId == commentId);
-
-            var like = await query.FirstOrDefaultAsync();
-            
             if (like == null)
                 return false;
 

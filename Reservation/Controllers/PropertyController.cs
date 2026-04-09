@@ -91,28 +91,9 @@ namespace Reservation.Controllers
         
         [Authorize(Roles = "Host,Admin")]
         [HttpGet("host/{hostId}")]
-        public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPropertiesByHost(int hostId)
+        public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPropertiesByHostId(int hostId)
         {
             var properties = await _propertyService.GetPropertiesByHostIdAsync(hostId);
-            return Ok(properties);
-        }
-
- 
-        [AllowAnonymous]
-        [HttpGet("price-range")]
-        public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPropertiesByPriceRange(
-            [FromQuery] decimal minPrice,
-            [FromQuery] decimal maxPrice)
-        {
-            var properties = await _propertyService.GetPropertiesByPriceRangeAsync(minPrice, maxPrice);
-            return Ok(properties);
-        }
-
-        [AllowAnonymous]
-        [HttpGet("capacity/{minCapacity}")]
-        public async Task<ActionResult<IEnumerable<PropertyDto>>> GetPropertiesByCapacity(int minCapacity)
-        {
-            var properties = await _propertyService.GetPropertiesByCapacityAsync(minCapacity);
             return Ok(properties);
         }
 

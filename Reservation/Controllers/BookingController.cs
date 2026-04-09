@@ -63,7 +63,14 @@ namespace Reservation.Controllers
             return result ? Ok(new { message = "Confirmed" }) : NotFound();
         }
 
-        
+        [Authorize(Roles = "Admin")]
+        [HttpGet("status/{status}")]
+        public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByStatus(BookingStatus status)
+        {
+            var bookings = await _bookingService.GetBookingsByStatusAsync(status);
+            return Ok(bookings);
+        }
+
         [Authorize(Roles = "Guest,Host,Admin")]
         [HttpPut("{id}/cancel")]
         public async Task<ActionResult> CancelBooking(int id)
@@ -78,15 +85,6 @@ namespace Reservation.Controllers
         public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByGuest(int guestId)
         {
             var bookings = await _bookingService.GetBookingsByGuestIdAsync(guestId);
-            return Ok(bookings);
-        }
-
-        
-        [Authorize(Roles = "Host,Admin")]
-        [HttpGet("property/{propertyId}")]
-        public async Task<ActionResult<IEnumerable<BookingDto>>> GetBookingsByProperty(int propertyId)
-        {
-            var bookings = await _bookingService.GetBookingsByPropertyIdAsync(propertyId);
             return Ok(bookings);
         }
 

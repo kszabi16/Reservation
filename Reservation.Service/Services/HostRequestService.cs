@@ -38,29 +38,6 @@ namespace Reservation.Service.Services
 
             return _mapper.Map<IEnumerable<HostRequestDto>>(pending);
         }
-
-        public async Task<HostRequestDto> CreateAsync(CreateHostRequestDto dto)
-        {
-            var user = await _context.Users.FindAsync(dto.UserId);
-            var property = await _context.Properties.FindAsync(dto.PropertyId);
-
-            if (user == null)
-                throw new InvalidOperationException("User not found.");
-            if (property == null)
-                throw new InvalidOperationException("Property not found.");
-
-            var newRequest = _mapper.Map<HostRequest>(dto);
-            _context.HostRequests.Add(newRequest);
-            await _context.SaveChangesAsync();
-
-            var loaded = await _context.HostRequests
-                .Include(r => r.User)
-                .Include(r => r.Property)
-                .FirstAsync(r => r.Id == newRequest.Id);
-
-            return _mapper.Map<HostRequestDto>(loaded);
-        }
-
         public async Task<bool> ApproveAsync(int id)
         {
             var request = await _context.HostRequests

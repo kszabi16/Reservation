@@ -10,7 +10,7 @@ namespace Reservation.Service.Interfaces
         Task<BookingDto> CreateBookingAsync(CreateBookingDto createBookingDto);
         Task<BookingDto?> UpdateBookingAsync(int id, CreateBookingDto updateBookingDto);
         Task<IEnumerable<BookingDto>> GetBookingsByGuestIdAsync(int guestId);
-        Task<IEnumerable<BookingDto>> GetBookingsByPropertyIdAsync(int propertyId);
+        Task<IEnumerable<BookingDto>> GetBookingsByStatusAsync(BookingStatus status);
         Task<bool> UpdateBookingStatusAsync(int id, BookingStatus status);
         Task<bool> CancelBookingAsync(int id);
         Task<bool> ConfirmBookingAsync(int id);

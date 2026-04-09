@@ -17,13 +17,6 @@ namespace Reservation.Service.Services
             _mapper = mapper;
             _context = context;
         }
-
-        public async Task<CommentDto?> GetCommentByIdAsync(int id)
-        {
-            var comment = await _context.Comments.FindAsync(id);
-            return comment == null ? null : _mapper.Map<CommentDto>(comment);
-        }
-
         public async Task<CommentDto> CreateCommentAsync(CreateCommentDto createCommentDto, int userId)
         {
             var property = await _context.Properties.FindAsync(createCommentDto.PropertyId);

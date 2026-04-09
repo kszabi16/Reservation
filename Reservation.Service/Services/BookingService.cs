@@ -90,17 +90,6 @@ namespace Reservation.Service.Services
                 .ToListAsync();
             return _mapper.Map<IEnumerable<BookingDto>>(bookings);
         }
-
-        public async Task<IEnumerable<BookingDto>> GetBookingsByPropertyIdAsync(int propertyId)
-        {
-            var bookings = await _context.Bookings
-                .Where(b => b.PropertyId == propertyId)
-                .OrderByDescending(b => b.CreatedAt)
-                .ToListAsync();
-            return _mapper.Map<IEnumerable<BookingDto>>(bookings);
-        }
-
-
         public async Task<bool> UpdateBookingStatusAsync(int id, BookingStatus status)
         {
             var booking = await _context.Bookings.FindAsync(id);
@@ -138,6 +127,14 @@ namespace Reservation.Service.Services
             booking.Status = BookingStatus.Confirmed;
             await _context.SaveChangesAsync();
             return true;
+        }
+        public async Task<IEnumerable<BookingDto>> GetBookingsByStatusAsync(BookingStatus status)
+        {
+            var bookings = await _context.Bookings
+                .Where(b => b.Status == status)
+                .OrderByDescending(b => b.CreatedAt)
+                .ToListAsync();
+            return _mapper.Map<IEnumerable<BookingDto>>(bookings);
         }
         public async Task<IEnumerable<BookingDto>> GetPendingBookingsForHostAsync(int hostId)
         {

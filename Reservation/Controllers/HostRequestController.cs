@@ -26,14 +26,6 @@ namespace Reservation.Controllers
         public async Task<ActionResult<IEnumerable<HostRequestDto>>> GetPending() =>
             Ok(await _service.GetPendingAsync());
 
-        [Authorize]
-        [HttpPost]
-        public async Task<ActionResult<HostRequestDto>> Create([FromBody] CreateHostRequestDto dto)
-        {
-            var request = await _service.CreateAsync(dto);
-            return CreatedAtAction(nameof(GetAll), new { id = request.Id }, request);
-        }
-
         [Authorize(Roles = "Admin")]
         [HttpPut("{id}/approve")]
         public async Task<ActionResult> Approve(int id)
